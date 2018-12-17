@@ -6,5 +6,7 @@
         double y { get; }
         double z { get; }
         double radius { get; }
+
+        Vector position { get; }
     }
 }

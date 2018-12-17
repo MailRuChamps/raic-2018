@@ -9,5 +9,7 @@ namespace Com.CodeGame.CodeBall2018.DevKit.CSharpCgdk.Model
         public double radius { get; set; }
         public double nitro_amount { get; set; }
         public int? respawn_ticks { get; set; }
+
+        public Vector position => new Vector(x, y, z);
     }
 }

@@ -17,5 +17,12 @@ namespace Com.CodeGame.CodeBall2018.DevKit.CSharpCgdk.Model
         public double? touch_normal_x { get; set; }
         public double? touch_normal_y { get; set; }
         public double? touch_normal_z { get; set; }
+
+        public Vector position => new Vector(x, y, z);
+        public Vector velocity => new Vector(velocity_x, velocity_y, velocity_z);
+
+        public Vector touch_normal => touch_normal_x.HasValue && touch_normal_y.HasValue && touch_normal_z.HasValue
+            ? new Vector(touch_normal_x.Value, touch_normal_y.Value, touch_normal_z.Value)
+            : null;
     }
 }
