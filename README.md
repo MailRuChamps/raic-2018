@@ -16,7 +16,7 @@ Good luck and have fun!
 3. Play CodeBall in the [browser](http://russianaicup.ru/play).
 
 ## Community for English speakers (Discord)
-We are [HERE (Discrord)](https://discord.gg/yhJRg7D). Join us! 
+We are [HERE](https://discord.gg/yhJRg7D). Join us! 
 
 ## Community for Russian speakers (Telegram)
 [HERE](https://t.me/aicups). Join us! 
