@@ -1,2 +1,3 @@
-# raic
-Russian AI Cup — artificial intelligence programming contest. Official website: http://russianaicup.ru
+# Russian AI Cup
+### Artificial intelligence programming contest. Official website: http://russianaicup.ru
+
