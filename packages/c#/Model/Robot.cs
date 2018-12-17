@@ -1,6 +1,6 @@
 namespace Com.CodeGame.CodeBall2018.DevKit.CSharpCgdk.Model
 {
-    public sealed class Robot : ISphere
+    public sealed class Robot : IMovableSphere
     {
         public int id { get; set; }
         public int player_id { get; set; }

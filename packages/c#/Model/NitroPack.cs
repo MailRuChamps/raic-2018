@@ -1,6 +1,6 @@
 namespace Com.CodeGame.CodeBall2018.DevKit.CSharpCgdk.Model
 {
-    public sealed class NitroPack
+    public sealed class NitroPack : ISphere
     {
         public int id { get; set; }
         public double x { get; set; }
