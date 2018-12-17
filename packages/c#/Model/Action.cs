@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace Com.CodeGame.CodeBall2018.DevKit.CSharpCgdk.Model
 {
     public sealed class Action
@@ -8,6 +10,7 @@ namespace Com.CodeGame.CodeBall2018.DevKit.CSharpCgdk.Model
         public double jump_speed { get; set; }
         public bool use_nitro { get; set; }
 
+        [JsonIgnore]
         public Vector target_velocity
         {
             get { return new Vector(target_velocity_x, target_velocity_y, target_velocity_z); }

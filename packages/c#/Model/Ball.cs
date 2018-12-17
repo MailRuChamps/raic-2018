@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace Com.CodeGame.CodeBall2018.DevKit.CSharpCgdk.Model
 {
     public sealed class Ball : IMovableSphere
@@ -10,7 +12,9 @@ namespace Com.CodeGame.CodeBall2018.DevKit.CSharpCgdk.Model
         public double velocity_z { get; set; }
         public double radius { get; set; }
 
+        [JsonIgnore]
         public Vector position => new Vector(x, y, z);
+        [JsonIgnore]
         public Vector velocity => new Vector(velocity_x, velocity_y, velocity_z);
     }
 }

@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace Com.CodeGame.CodeBall2018.DevKit.CSharpCgdk.Model
 {
     public sealed class NitroPack : ISphere
@@ -10,6 +12,7 @@ namespace Com.CodeGame.CodeBall2018.DevKit.CSharpCgdk.Model
         public double nitro_amount { get; set; }
         public int? respawn_ticks { get; set; }
 
+        [JsonIgnore]
         public Vector position => new Vector(x, y, z);
     }
 }
