@@ -19,4 +19,4 @@ Good luck and have fun!
 We are [HERE](https://t.me/aicups). Join us!
 
 ## Official Contacts
-Also, we've email **cups@corp.mail.ru**. If you have any private questions, you can ask us. We always check our inbox and reply to all letters.
+Also, we've email **cups@corp.mail.ru**. If you have any private questions, you can ask us. We always check our inbox and reply to all.
