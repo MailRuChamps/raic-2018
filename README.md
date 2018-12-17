@@ -1,4 +1,4 @@
-# Russian AI Cup
+# Russian AI Cup (not only Russian!)
 ### Artificial intelligence programming contest. Official website: http://russianaicup.ru
 Russian AI Cup — intitiative of the company Mail.Ru Group within the IT-oriented competitions.In this championship participants compete in skills of creating an artificial intelligence on example of game stratefies. Organizers are Mail.Ru Group and Codeforces. Best participants will receive special prizes.
 
