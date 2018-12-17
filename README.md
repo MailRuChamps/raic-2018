@@ -15,8 +15,11 @@ Good luck and have fun!
 2. Quick start [instructions](http://russianaicup.ru/p/quick). Other sources will be published soon on this repository and [here](http://russianaicup.ru/p/examples);
 3. Play CodeBall in the [browser](http://russianaicup.ru/play).
 
-## Community
-We are [HERE](https://t.me/aicups). Join us!
+## Community for English speakers (Discord)
+We are [HERE (Discrord)](https://discord.gg/yhJRg7D). Join us! 
+
+## Community for Russian speakers (Telegram)
+[HERE](https://t.me/aicups). Join us! 
 
 ## Official Contacts
 Also, we've email **cups@corp.mail.ru**. If you have any private questions, you can ask us. We always check our inbox and reply to all.
