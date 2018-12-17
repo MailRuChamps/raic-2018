@@ -11,11 +11,12 @@ Some links on the website are not working. We will fix it within a few days.
 Good luck and have fun!
 
 ## Useful links
-1. About [CodeBall](http://russianaicup.ru). News, Notifications.
-2. Quick start [instructions](http://russianaicup.ru/p/quick). Other sources will be published soon on this repository and [here](http://russianaicup.ru/p/examples)
-3. Play CodeBall in the [browser](http://russianaicup.ru/play)
+1. About [CodeBall](http://russianaicup.ru). News, Notifications;
+2. Quick start [instructions](http://russianaicup.ru/p/quick). Other sources will be published soon on this repository and [here](http://russianaicup.ru/p/examples);
+3. Play CodeBall in the [browser](http://russianaicup.ru/play).
 
 ## Community
 We are [HERE](https://t.me/aicups). Join us!
 
-
+## Official Contacts
+Also, we've email **cups@corp.mail.ru**. If you have any private questions, you can ask us. We always check our inbox and reply to all letters.
