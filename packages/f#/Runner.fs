@@ -4,26 +4,33 @@ open System.Collections.Generic
 open FSharpCgdk.Model
 
 module Runner = 
+
+    let private iteration (actions : IDictionary<int, Action>) acc rules game =
+        let processRobot acc robot = 
+            let action, acc = MyStrategy.act(robot, rules, game, acc)
+            actions.Add(robot.id, action) 
+            acc 
+        game.robots
+        |> Array.filter (fun x -> x.is_teammate)
+        |> Array.fold processRobot EmptyData
+
     let startRunner rpc token = 
         RemoteProcessClient.writeToken rpc token
 
         let rules = RemoteProcessClient.readRules rpc |> Option.get
+        let gameOpt = RemoteProcessClient.readGame rpc 
         let actions = new Dictionary<int, Action>()
-        let inIter game =
-            actions.Clear()
-            for robot in game.robots do
-                if robot.is_teammate then
-                    let action = MyStrategy.act robot rules game
-                    actions.Add(robot.id, action) 
-            RemoteProcessClient.write rpc actions 
-            RemoteProcessClient.readGame rpc           
-
-        let rec iterRunner = function
-            | None -> ()
-            | Some game -> iterRunner (inIter game)
         
-        RemoteProcessClient.readGame rpc 
-        |> iterRunner
+        let rec iterRunner = function
+            | _, None -> ()
+            | acc, Some game -> 
+                actions.Clear()
+                let acc = iteration actions acc rules game
+                RemoteProcessClient.write rpc actions
+                let gameOpt = RemoteProcessClient.readGame rpc
+                iterRunner (acc, gameOpt)
+
+        iterRunner (EmptyData, gameOpt)
     
     [<EntryPoint>]
     let main(args : string array) = 
