@@ -1,3 +1,3 @@
 set -ex
 
-ruby /output/runner.rb "$@"
+cd /output && ruby ./runner.rb "$@"

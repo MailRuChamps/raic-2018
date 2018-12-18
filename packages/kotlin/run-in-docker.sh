@@ -1,3 +1,3 @@
 set -ex
 
-java -jar /output/kotlin-cgdk-jar-with-dependencies.jar "$@"
+cd /output && java -jar ./kotlin-cgdk-jar-with-dependencies.jar "$@"

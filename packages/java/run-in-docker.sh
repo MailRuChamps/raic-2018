@@ -1,3 +1,3 @@
 set -ex
 
-java -jar /output/java-cgdk-jar-with-dependencies.jar "$@"
+cd /output && java -jar ./java-cgdk-jar-with-dependencies.jar "$@"

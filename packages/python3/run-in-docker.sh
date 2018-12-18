@@ -1,3 +1,3 @@
 set -ex
 
-python /output/Runner.py "$@"
+cd /output && python ./Runner.py "$@"
