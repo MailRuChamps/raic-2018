@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.Json" Version="0.3.4" />
+    <Compile Include="Model/Consts.fs" />
     <Compile Include="Model/Action.fs" />
     <Compile Include="Model/Arena.fs" />
     <Compile Include="Model/Ball.fs" />
