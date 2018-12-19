@@ -19,6 +19,8 @@ module MyStrategy =
     let private max_speed32 = float32 ROBOT_MAX_GROUND_SPEED
     let private max_jump = ROBOT_MAX_JUMP_SPEED
 
+    let private vector2 x y = Vector2 (x, y) 
+
 
     let getJumpSpeed (robot : Robot) (ball : Ball) (dist  : float) = 
         let need_jump = dist < (BALL_RADIUS + ROBOT_MAX_RADIUS) && robot.y < ball.y
@@ -35,9 +37,9 @@ module MyStrategy =
 
         let interception = 
             if ball.velocity_z > -EPS then 
-                Vector2(0.f, float32 target_pos_z)
+                vector2 0.f (float32 target_pos_z)
             else
-                Vector2(float32 x, float32 target_pos_z)
+                vector2 (float32 x) (float32 target_pos_z)
 
         let target_velocity = (interception - Robot.position2 me) * max_speed32
 
