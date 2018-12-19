@@ -9,7 +9,7 @@
 - Константы симуляции теперь доступны в объекте `Rules`
 - Множество новых параметров для local runner ([подробнее](/p/localrunner))
 
-Скачайте новую версию [правил](/p/rules), [языкового пакета](/p/packs) и [local runner](/p/localrunner) и вперед, улучшать свои стратегии!
+Скачайте новую версию [правил](http://russianaicup.ru/p/rules), [языкового пакета](http://russianaicup.ru/p/packs) и [local runner](http://russianaicup.ru/p/localrunner) и вперед, улучшать свои стратегии!
 
 Правила игры и языковые пакеты опубликованы на [Github](https://github.com/MailRuChamps/raic). Там вы оперативно сможете отслеживать список вносимых правок.
 
@@ -26,6 +26,6 @@ In the meantime, we have fixed a lot of bug, and we also have following updates:
 - Simulation constants are now available in `Rules` object
 - Many new parameters for local runner ([more here](/p/localrunner))
 
-Download new version of [rules](/p/rules), [language pack](/p/packs) and [local runner](/p/localrunner) and go, improve your strategies!
+Download new version of [rules](http://russianaicup.ru/p/rules), [language pack](http://russianaicup.ru/p/packs) and [local runner](http://russianaicup.ru/p/localrunner) and go, improve your strategies!
 
 Rules and language packages are published on [Github](https://github.com/MailRuChamps/raic). There you will be able to see the changes.
