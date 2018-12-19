@@ -1,0 +1,439 @@
+\chapter{Симулятор}
+
+Симуляция в CodeBall основана на простой физической модели, использующей метод импульсов.
+В системе отсутствует какое либо трение, все столкновения разрешаются последовательно в случайном порядке.
+
+Псевдо-код симулятора:
+
+\begin{verbatim}
+function collide_entities(a: Entity, b: Entity):
+    let delta_position = b.position - a.position
+    let distance = length(delta_position)
+    let penetration = a.radius + b.radius - distance
+    if penetration > 0:
+        let k_a = (1 / a.mass) / ((1 / a.mass) + (1 / b.mass))
+        let k_b = (1 / b.mass) / ((1 / a.mass) + (1 / b.mass))
+        let normal = normalize(delta_position)
+        a.position -= normal * penetration * k_a
+        b.position += normal * penetration * k_b
+        let delta_velocity = dot(b.velocity - a.velocity, normal)
+            + b.radius_change_speed - a.radius_change_speed
+        if delta_velocity < 0:
+            let impulse = (1 + random(MIN_HIT_E, MAX_HIT_E)) * delta_velocity * normal
+            a.velocity += impulse * k_a
+            b.velocity -= impulse * k_b
+
+function collide_with_arena(e: Entity):
+    let distance, normal = dan_to_arena(e.position)
+    let penetration = e.radius - distance
+    if penetration > 0:
+        e.position += penetration * normal
+        let velocity = dot(e.velocity, normal) - e.radius_change_speed
+        if velocity < 0:
+            e.velocity -= (1 + e.arena_e) * velocity * normal
+            return normal
+    return None
+
+function move(e: Entity):
+    e.velocity = clamp(e.velocity, MAX_ENTITY_SPEED)
+    e.position += e.velocity * delta_time
+    e.position.y -= GRAVITY * delta_time * delta_time / 2
+    e.velocity.y -= GRAVITY * delta_time
+
+function update(delta_time: float):
+    shuffle(robots)
+
+    for robot in robots:
+        if robot.touch:
+            let target_velocity = clamp(
+                robot.action.target_velocity,
+                ROBOT_MAX_GROUND_SPEED)
+            target_velocity -= robot.touch_normal
+                * dot(robot.touch_normal, target_velocity)
+            let target_velocity_change = target_velocity - robot.velocity
+            if length(target_velocity_change) > 0:
+                let acceleration = ROBOT_ACCELERATION * max(0, robot.touch_normal.y)
+                robot.velocity += clamp(
+                    normalize(target_velocity_change) * acceleration * delta_time,
+                    length(target_velocity_change))
+
+        if robot.action.use_nitro:
+            let target_velocity_change = clamp(
+                robot.action.target_velocity - robot.velocity,
+                robot.nitro * NITRO_POINT_VELOCITY_CHANGE)
+            if length(target_velocity_change) > 0:
+                let acceleration = normalize(target_velocity_change)
+                    * ROBOT_NITRO_ACCELERATION
+                let velocity_change = clamp(
+                    acceleration * delta_time,
+                    length(target_velocity_change))
+                robot.velocity += velocity_change
+                robot.nitro -= length(velocity_change)
+                    / NITRO_POINT_VELOCITY_CHANGE
+
+        move(robot)
+        robot.radius = ROBOT_MIN_RADIUS + (ROBOT_MAX_RADIUS - ROBOT_MIN_RADIUS)
+                    * robot.action.jump_speed / ROBOT_MAX_JUMP_SPEED
+        robot.radius_change_speed = robot.action.jump_speed
+
+    move(ball)
+
+    for i in 0 .. length(robots) - 1:
+        for j in 0 .. i - 1:
+            collide_entities(robots[i], robots[j])
+
+    for robot in robots:
+        collide_entities(robot, ball)
+        collision_normal = collide_with_arena(robot)
+        if collision_normal is None:
+            robot.touch = false
+        else:
+            robot.touch = true
+            robot.touch_normal = collision_normal
+    collide_with_arena(ball)
+
+    if abs(ball.position.z) > arena.depth / 2 + ball.radius:
+        goal_scored()
+
+    for robot in robots:
+        if robot.nitro == MAX_NITRO_AMOUNT:
+            continue
+        for pack in nitro_packs:
+            if not pack.alive:
+                continue
+            if length(robot.position - pack.position) <= robot.radius + pack.radius:
+                robot.nitro = MAX_NITRO_AMOUNT
+                pack.alive = false
+                pack.respawn_ticks = NITRO_PACK_RESPAWN_TICKS
+
+function tick():
+    let delta_time = 1 / TICKS_PER_SECOND
+    for _ in 0 .. MICROTICKS_PER_TICK - 1:
+        update(delta_time / MICROTICKS_PER_TICK)
+
+    for pack in nitro_packs:
+        if pack.alive:
+            continue
+        pack.respawn_ticks -= 1
+        if pack.respawn_ticks == 0:
+            pack.alive = true
+\end{verbatim}
+
+\section{Определение ближайшей точки арены}
+
+\begin{verbatim}
+function dan_to_plane(point: Vec3D, point_on_plane: Vec3D, plane_normal: Vec3D):
+    return {
+        distance: dot(point - point_on_plane, plane_normal)
+        normal: plane_normal
+    }
+
+function dan_to_sphere_inner(point: Vec3D, sphere_center: Vec3D, sphere_radius: Float):
+    return {
+        distance: sphere_radius - length(point - sphere_center)
+        normal: normalize(sphere_center - point)
+    }
+
+function dan_to_sphere_outer(point: Vec3D, sphere_center: Vec3D, sphere_radius: Float):
+    return {
+        distance: length(point - sphere_center) - sphere_radius
+        normal: normalize(point - sphere_center)
+    }
+}
+
+function dan_to_arena_quarter(point: Vec3D):
+    // Ground
+    let dan = dan_to_plane(point, (0, 0, 0), (0, 1, 0))
+
+    // Ceiling
+    dan = min(dan, dan_to_plane(point, (0, arena.height, 0), (0, -1, 0)))
+
+    // Side x
+    dan = min(dan, dan_to_plane(point, (arena.width / 2, 0, 0), (-1, 0, 0)))
+
+    // Side z (goal)
+    dan = min(dan, dan_to_plane(
+            point,
+            (0, 0, (arena.depth / 2) + arena.goal_depth),
+            (0, 0, -1)))
+
+    // Side z
+    let v = (point.x, point.y) - (
+            (arena.goal_width / 2) - arena.goal_top_radius,
+            arena.goal_height - arena.goal_top_radius)
+    if point.x >= (arena.goal_width / 2) + arena.goal_side_radius
+            or point.y >= arena.goal_height + arena.goal_side_radius
+            or (
+                v.x > 0
+                and v.y > 0
+                and length(v) >= arena.goal_top_radius + arena.goal_side_radius):
+        dan = min(dan, dan_to_plane(point, (0, 0, arena.depth / 2), (0, 0, -1)))
+
+    // Side x & ceiling (goal)
+    if point.z >= (arena.depth / 2) + arena.goal_side_radius:
+        // x
+        dan = min(dan, dan_to_plane(
+                point,
+                (arena.goal_width / 2, 0, 0),
+                (-1, 0, 0)))
+        // y
+        dan = min(dan, dan_to_plane(point, (0, arena.goal_height, 0), (0, -1, 0)))
+
+    // Goal back corners
+    assert arena.bottom_radius == arena.goal_top_radius
+    if point.z > (arena.depth / 2) + arena.goal_depth - arena.bottom_radius:
+        dan = min(dan, dan_to_sphere_inner(
+                point,
+                (
+                    clamp(
+                        point.x,
+                        arena.bottom_radius - (arena.goal_width / 2),
+                        (arena.goal_width / 2) - arena.bottom_radius,
+                    ),
+                    clamp(
+                        point.y,
+                        arena.bottom_radius,
+                        arena.goal_height - arena.goal_top_radius,
+                    ),
+                    (arena.depth / 2) + arena.goal_depth - arena.bottom_radius),
+                arena.bottom_radius))
+
+    // Corner
+    if point.x > (arena.width / 2) - arena.corner_radius
+            and point.z > (arena.depth / 2) - arena.corner_radius:
+        dan = min(dan, dan_to_sphere_inner(
+                point,
+                (
+                    (arena.width / 2) - arena.corner_radius,
+                    point.y,
+                    (arena.depth / 2) - arena.corner_radius
+                ),
+                arena.corner_radius))
+
+    // Goal outer corner
+    if point.z < (arena.depth / 2) + arena.goal_side_radius:
+        // Side x
+        if point.x < (arena.goal_width / 2) + arena.goal_side_radius:
+            dan = min(dan, dan_to_sphere_outer(
+                    point,
+                    (
+                        (arena.goal_width / 2) + arena.goal_side_radius,
+                        point.y,
+                        (arena.depth / 2) + arena.goal_side_radius
+                    ),
+                    arena.goal_side_radius))
+        // Ceiling
+        if point.y < arena.goal_height + arena.goal_side_radius:
+            dan = min(dan, dan_to_sphere_outer(
+                    point,
+                    (
+                        point.x,
+                        arena.goal_height + arena.goal_side_radius,
+                        (arena.depth / 2) + arena.goal_side_radius
+                    ),
+                    arena.goal_side_radius))
+        // Top corner
+        let o = (
+            (arena.goal_width / 2) - arena.goal_top_radius,
+            arena.goal_height - arena.goal_top_radius
+        )
+        let v = (point.x, point.y) - o
+        if v.x > 0 and v.y > 0:
+            let o = o + normalize(v) * (arena.goal_top_radius + arena.goal_side_radius)
+            dan = min(dan, dan_to_sphere_outer(
+                    point,
+                    (o.x, o.y, (arena.depth / 2) + arena.goal_side_radius),
+                    arena.goal_side_radius))
+
+    // Goal inside top corners
+    if point.z > (arena.depth / 2) + arena.goal_side_radius
+            and point.y > arena.goal_height - arena.goal_top_radius:
+        // Side x
+        if point.x > (arena.goal_width / 2) - arena.goal_top_radius:
+            dan = min(dan, dan_to_sphere_inner(
+                    point,
+                    (
+                        (arena.goal_width / 2) - arena.goal_top_radius,
+                        arena.goal_height - arena.goal_top_radius,
+                        point.z
+                    ),
+                    arena.goal_top_radius))
+        // Side z
+        if point.z > (arena.depth / 2) + arena.goal_depth - arena.goal_top_radius:
+            dan = min(dan, dan_to_sphere_inner(
+                    point,
+                    (
+                        point.x,
+                        arena.goal_height - arena.goal_top_radius,
+                        (arena.depth / 2) + arena.goal_depth - arena.goal_top_radius
+                    ),
+                    arena.goal_top_radius))
+
+    // Bottom corners
+    if point.y < arena.bottom_radius:
+        // Side x
+        if point.x > (arena.width / 2) - arena.bottom_radius:
+            dan = min(dan, dan_to_sphere_inner(
+                    point,
+                    (
+                        (arena.width / 2) - arena.bottom_radius,
+                        arena.bottom_radius,
+                        point.z
+                    ),
+                    arena.bottom_radius))
+        // Side z
+        if point.z > (arena.depth / 2) - arena.bottom_radius
+                and point.x >= (arena.goal_width / 2) + arena.goal_side_radius:
+            dan = min(dan, dan_to_sphere_inner(
+                    point,
+                    (
+                        point.x,
+                        arena.bottom_radius,
+                        (arena.depth / 2) - arena.bottom_radius
+                    ),
+                    arena.bottom_radius))
+        // Side z (goal)
+        if point.z > (arena.depth / 2) + arena.goal_depth - arena.bottom_radius:
+            dan = min(dan, dan_to_sphere_inner(
+                    point,
+                    (
+                        point.x,
+                        arena.bottom_radius,
+                        (arena.depth / 2) + arena.goal_depth - arena.bottom_radius
+                    ),
+                    arena.bottom_radius))
+        // Goal outer corner
+        let o = (
+            (arena.goal_width / 2) + arena.goal_side_radius,
+            (arena.depth / 2) + arena.goal_side_radius
+        )
+        let v = (point.x, point.z) - o
+        if v.x < 0 and v.y < 0
+                and length(v) < arena.goal_side_radius + arena.bottom_radius:
+            let o = o + normalize(v) * (arena.goal_side_radius + arena.bottom_radius)
+            dan = min(dan, dan_to_sphere_inner(
+                    point,
+                    (o.x, arena.bottom_radius, o.y),
+                    arena.bottom_radius))
+        // Side x (goal)
+        if point.z >= (arena.depth / 2) + arena.goal_side_radius
+                and point.x > (arena.goal_width / 2) - arena.bottom_radius:
+            dan = min(dan, dan_to_sphere_inner(
+                    point,
+                    (
+                        (arena.goal_width / 2) - arena.bottom_radius,
+                        arena.bottom_radius,
+                        point.z
+                    ),
+                    arena.bottom_radius))
+        // Corner
+        if point.x > (arena.width / 2) - arena.corner_radius
+                and point.z > (arena.depth / 2) - arena.corner_radius:
+            let corner_o = (
+                (arena.width / 2) - arena.corner_radius,
+                (arena.depth / 2) - arena.corner_radius
+            )
+            let n = (point.x, point.z) - corner_o
+            let dist = n.len()
+            if dist > arena.corner_radius - arena.bottom_radius:
+                let n = n / dist
+                let o2 = corner_o + n * (arena.corner_radius - arena.bottom_radius)
+                dan = min(dan, dan_to_sphere_inner(
+                        point,
+                        (o2.x, arena.bottom_radius, o2.y),
+                        arena.bottom_radius))
+
+    // Ceiling corners
+    if point.y > arena.height - arena.top_radius:
+        // Side x
+        if point.x > (arena.width / 2) - arena.top_radius:
+            dan = min(dan, dan_to_sphere_inner(
+                    point,
+                    (
+                        (arena.width / 2) - arena.top_radius,
+                        arena.height - arena.top_radius,
+                        point.z,
+                    ),
+                    arena.top_radius))
+        // Side z
+        if point.z > (arena.depth / 2) - arena.top_radius:
+            dan = min(dan, dan_to_sphere_inner(
+                    point,
+                    (
+                        point.x,
+                        arena.height - arena.top_radius,
+                        (arena.depth / 2) - arena.top_radius,
+                    )
+                    arena.top_radius))
+
+        // Corner
+        if point.x > (arena.width / 2) - arena.corner_radius
+                and point.z > (arena.depth / 2) - arena.corner_radius:
+            let corner_o = (
+                (arena.width / 2) - arena.corner_radius,
+                (arena.depth / 2) - arena.corner_radius
+            )
+            let dv = (point.x, point.z) - corner_o
+            if length(dv) > arena.corner_radius - arena.top_radius:
+                let n = normalize(dv)
+                let o2 = corner_o + n * (arena.corner_radius - arena.top_radius)
+                dan = min(dan, dan_to_sphere_inner(
+                        point,
+                        (o2.x, arena.height - arena.top_radius, o2.y),
+                        arena.top_radius))
+    
+    return dan    
+}
+
+function dan_to_arena(point: Vec3D):
+    let negate_x = point.x < 0
+    let negate_z = point.z < 0
+    if negate_x:
+        point.x = -point.x
+    if negate_z:
+        point.z = -point.z
+    let result = dan_to_arena_quarter(point)
+    if negate_x:
+        result.normal.x = -result.normal.x
+    if negate_z:
+        result.normal.z = -result.normal.z
+    return result
+\end{verbatim}
+
+\section{Константы}\label{constants}
+
+Все константы также доступны в объекте \texttt{Rules} (см. \ref{api}).
+
+Обратите внимание, что константы скоростей и ускорений даны в системе
+$\frac{единица\ расстояния}{секунда}$ и $\frac{единица\ расстояния}{секунда^2}$.
+
+\begin{verbatim}
+ROBOT_MIN_RADIUS = 1
+ROBOT_MAX_RADIUS = 1.05
+ROBOT_MAX_JUMP_SPEED = 15
+ROBOT_ACCELERATION = 100
+ROBOT_NITRO_ACCELERATION = 30
+ROBOT_MAX_GROUND_SPEED = 30
+ROBOT_ARENA_E = 0
+ROBOT_RADIUS = 1
+ROBOT_MASS = 2
+TICKS_PER_SECOND = 60
+MICROTICKS_PER_TICK = 100
+RESET_TICKS = 2 * TICKS_PER_SECOND
+BALL_ARENA_E = 0.7
+BALL_RADIUS = 2
+BALL_MASS = 1
+MIN_HIT_E = 0.4
+MAX_HIT_E = 0.5
+MAX_ENTITY_SPEED = 100
+MAX_NITRO_AMOUNT = 100
+START_NITRO_AMOUNT = 50
+NITRO_POINT_VELOCITY_CHANGE = 0.6
+NITRO_PACK_X = 20
+NITRO_PACK_Y = 1
+NITRO_PACK_Z = 30
+NITRO_PACK_RADIUS = 0.5
+NITRO_PACK_AMOUNT = 100
+NITRO_PACK_RESPAWN_TICKS = 10 * TICKS_PER_SECOND
+GRAVITY = 30
+\end{verbatim}
