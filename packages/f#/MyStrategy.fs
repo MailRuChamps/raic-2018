@@ -2,17 +2,40 @@ namespace FSharpCgdk
 
 open FSharpCgdk.Model
 open System.Numerics
+open FSharp.Json
 
 
 type StrategyData = 
     | EmptyData
-    | AttackBotData of tick : int * idRobot : int 
+    | AttackBotData of idRobot : int 
 
 
 type ActData = Robot * Rules * Game * StrategyData
 
 
+type Tmp3d = {
+    x : float
+    y : float
+    z : float
+}
+
+type Tmp2d = {
+    x : float
+    y : float
+}
+
 module MyStrategy = 
+
+
+    let private _log game name msg = 
+        printfn "%5d|%6s|%s" game.current_tick name msg
+
+    let mutable log = fun name msg -> ()
+
+    let logJson name_obj x =
+        Json.serialize x
+        |> sprintf "%s is %s" name_obj
+        |> log "json"
 
 
     let private EPS = 0.1
@@ -49,15 +72,23 @@ module MyStrategy =
     let simulationLinear func nextState breaker startState ticks = 
         let rec iter ticks state = 
             if ticks = 0 || breaker state then
+                log "sim" "break"
                 None
             else 
                 match func state with
-                | None -> iter (ticks - 1) state
-                | Some x -> Some x
+                | None -> 
+                    log "sim" "not found, go next"
+                    iter (ticks - 1) state
+                | Some x -> 
+                    log "sim" "find"
+                    Some x
         iter ticks startState  
     
 
     let attackEntry (me, arena, ball) : Action option = 
+
+        log "Robot" "Need find attack entry point."
+
         let me_pos = Robot.position me
         let ball_pos = Ball.position ball
 
@@ -68,10 +99,16 @@ module MyStrategy =
         
         let me_pos2d = Robot.position2 me
         let inSim (pos : Vector3, time : float) = 
+            logJson "pos" { x = float pos.X; y = float pos.Y; z = float pos.Z }
+            logJson "time" time
             let pos2d = Vector2(pos.X, pos.Z)
+            logJson "pos2d" { x = float pos2d.X; y = float pos2d.Y }
             let delta = pos2d - me_pos2d
             let need_speed = float (delta.Length()) / time
             let mx_speed = ROBOT_MAX_GROUND_SPEED
+            logJson "delta" { x = float delta.X; y = float delta.Y }
+            logJson "need_speed" need_speed
+            logJson "mx_speed" mx_speed
             if 0.5 * mx_speed < need_speed && need_speed < mx_speed then
                 let velocity_target = Vector2.Normalize(delta) * (float32 need_speed)
                 Action.fromVector2 velocity_target jump_speed true
@@ -92,8 +129,12 @@ module MyStrategy =
     let attackAct (args : ActData) : Action =
         let me, rules, game, _ = args
         match attackEntry (me, rules.arena, game.ball) with
-        | Some x -> x
-        | None -> defenseAct args
+        | Some x ->
+            log "Robot" "I known how attack!!!"
+            x
+        | None -> 
+            log "Robot" "I don't known how attack! QwQ"
+            defenseAct args
         
 
     let private tuple2 x y = (x, y)
@@ -101,33 +142,39 @@ module MyStrategy =
 
     let (|AttackBot|DefenseBot|) (robot : Robot, data : StrategyData) =
         match data with
-        | EmptyData -> DefenseBot
-        | AttackBotData(_, id) when id <> robot.id -> DefenseBot
-        | _ -> AttackBot
+        | EmptyData -> 
+            failwith "EmptyData at (|AttackBot|DefenseBot|). Error!!!"
+        | AttackBotData id when id = robot.id -> 
+            log "Robot" "I am AttackBot"
+            AttackBot
+        | _ -> 
+            log "Robot" "I am DefenseBot"
+            DefenseBot
 
 
     let nextData (args : ActData) : StrategyData = 
-        let _, _, game, data = args
-        let dataTick = 
-            match data with
-            | EmptyData -> -1
-            | AttackBotData (tick, _) -> tick
-        if dataTick = game.current_tick then
-            data
-        else
-            game.robots
-            |> Array.filter (fun x -> x.is_teammate)
-            |> Array.maxBy (fun x -> x.z)
-            |> Robot.id 
-            |> tuple2 game.current_tick
-            |> AttackBotData
+        let _, _, game, _ = args
+        game.robots
+        |> Array.filter (fun x -> x.is_teammate)
+        |> Array.maxBy (fun x -> x.z)
+        |> Robot.id 
+        |> AttackBotData
 
 
     let act (me : Robot, rules : Rules, game : Game, data : StrategyData) : Action * StrategyData =
+        log <- _log game
+        
+        sprintf "My id is %d." me.id
+        |> log "Robot" 
+
         let data = nextData (me, rules, game, data)
         let args = me, rules, game, data
         let action = 
             match me, data with
-            | AttackBot -> attackAct args
-            | DefenseBot -> defenseAct args
+            | AttackBot ->
+                log "Robot" "I will attack!"
+                attackAct args
+            | DefenseBot -> 
+                log "Robot" "I will defend!"
+                defenseAct args
         action, data
