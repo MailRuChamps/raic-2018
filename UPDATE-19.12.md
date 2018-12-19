@@ -7,7 +7,7 @@
 - Обновлен пакет для Python (добавлены `numpy`, `pytorch`)
 - Обновлена версия Kotlin до 1.3.11
 - Константы симуляции теперь доступны в объекте `Rules`
-- Множество новых параметров для local runner ([подробнее](/p/localrunner))
+- Множество новых параметров для local runner ([подробнее](http://russianaicup.ru/p/localrunner))
 
 Скачайте новую версию [правил](http://russianaicup.ru/p/rules), [языкового пакета](http://russianaicup.ru/p/packs) и [local runner](http://russianaicup.ru/p/localrunner) и вперед, улучшать свои стратегии!
 
