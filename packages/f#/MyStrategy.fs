@@ -33,7 +33,7 @@ module MyStrategy =
     let mutable log = fun name msg -> ()
 
     let logJson name_obj x =
-        Json.serialize x
+        Json.serializeU x
         |> sprintf "%s is %s" name_obj
         |> log "json"
 
@@ -95,9 +95,12 @@ module MyStrategy =
         log "Robot" "Need find attack entry point."
 
         let me_pos = Robot.position me
+        logJson "me_pos" { x = float me_pos.X; y = float me_pos.Y; z = float me_pos.Z }
         let ball_pos = Ball.position ball
+        logJson "ball_pos" { x = float ball_pos.X; y = float ball_pos.Y; z = float ball_pos.Z }
 
         let delta = ball_pos - me_pos
+        logJson "delta" { x = float delta.X; y = float delta.Y; z = float delta.Z }
 
         let jump = float (delta.Length()) < (BALL_RADIUS + ROBOT_MAX_RADIUS) && me.y < ball.y
         let jump_speed = if jump then ROBOT_MAX_JUMP_SPEED else 0.   
@@ -122,6 +125,7 @@ module MyStrategy =
                 None      
 
         let ball_pos_delta = Ball.velocity ball * 0.1f
+        logJson "ball_pos_delta" { x = float ball_pos_delta.X; y = float ball_pos_delta.Y; z = float ball_pos_delta.Z }
         let nextState (pos : Vector3, time) = (pos + ball_pos_delta, time + 0.1)
 
         let notInArena (pos : Vector3) = 
