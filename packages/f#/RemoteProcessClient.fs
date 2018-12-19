@@ -48,7 +48,7 @@ module RemoteProcessClient =
     let write rpc actions = 
         let json = Json.serializeU actions
         log "write" json
-        rpc.Writer.WriteLine()
+        rpc.Writer.WriteLine json
         rpc.Writer.Flush()
 
     let writeToken rpc (token : string) = 
