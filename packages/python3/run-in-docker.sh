@@ -1,3 +1,3 @@
 set -ex
 
-cd /output && python ./Runner.py "$@"
+KERAS_BACKEND=theano cd /output && python ./Runner.py "$@"
