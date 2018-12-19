@@ -5,27 +5,24 @@ open FSharpCgdk.Model
 
 module Runner = 
 
-    let private iteration (actions : IDictionary<int, Action>) acc rules game =
-        let processRobot acc robot = 
+    let private iteration acc rules game =
+        let processRobot (acc, actions) robot = 
             let action, acc = MyStrategy.act(robot, rules, game, acc)
-            actions.Add(robot.id, action) 
-            acc 
+            acc, Map.add robot.id action actions
         game.robots
         |> Array.filter (fun x -> x.is_teammate)
-        |> Array.fold processRobot EmptyData
+        |> Array.fold processRobot (EmptyData, Map.empty)
 
     let startRunner rpc token = 
         RemoteProcessClient.writeToken rpc token
 
         let rules = RemoteProcessClient.readRules rpc |> Option.get
         let gameOpt = RemoteProcessClient.readGame rpc 
-        let actions = new Dictionary<int, Action>()
         
         let rec iterRunner = function
             | _, None -> ()
             | acc, Some game -> 
-                actions.Clear()
-                let acc = iteration actions acc rules game
+                let acc, actions = iteration acc rules game
                 RemoteProcessClient.write rpc actions
                 let gameOpt = RemoteProcessClient.readGame rpc
                 iterRunner (acc, gameOpt)

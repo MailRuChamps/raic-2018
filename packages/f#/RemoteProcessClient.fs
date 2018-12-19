@@ -38,7 +38,7 @@ module RemoteProcessClient =
 
     let readRules rpc : Rules option = read rpc
 
-    let write rpc (actions : IDictionary<int, Action>) = 
+    let write rpc actions = 
         rpc.Writer.WriteLine(Json.serialize actions)
         rpc.Writer.Flush()
 
