@@ -83,7 +83,7 @@ module MyStrategy =
                 match func state with
                 | None -> 
                     log "sim" "not found, go next"
-                    iter (ticks - 1) state
+                    iter (ticks - 1) (nextState state)
                 | Some x -> 
                     log "sim" "find"
                     Some x
