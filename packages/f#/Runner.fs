@@ -8,7 +8,7 @@ module Runner =
     let private iteration acc rules game =
         let processRobot (acc, actions) robot = 
             let action, acc = MyStrategy.act(robot, rules, game, acc)
-            acc, Map.add robot.id action actions
+            acc, Map.add (string robot.id) action actions
         game.robots
         |> Array.filter (fun x -> x.is_teammate)
         |> Array.fold processRobot (EmptyData, Map.empty)
