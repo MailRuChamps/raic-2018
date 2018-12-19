@@ -19,7 +19,7 @@ type RemoteProcessClient = {
 module RemoteProcessClient = 
 
     let private log strAction msg =
-        printf "%6s | %6s |> %s" "RPC" strAction msg
+        printfn "%6s | %6s |> %s" "RPC" strAction msg
 
     let create host port = 
         let client = new TcpClient(host, port)

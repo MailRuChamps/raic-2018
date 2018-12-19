@@ -6,7 +6,7 @@ open FSharpCgdk.Model
 module Runner = 
 
     let private log strAction msg = 
-        printf "%6s | %6s |> %s" "Runner" strAction msg
+        printfn "%6s | %6s |> %s" "Runner" strAction msg
 
 
     let private iteration acc rules game =
