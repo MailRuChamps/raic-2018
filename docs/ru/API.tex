@@ -1,0 +1,173 @@
+\chapter{Описание API}\label{api}
+
+\section{MyStrategy}
+
+В языковом пакете для вашего языка программирования находится файл с именем \texttt{MyStrategy/my\_strategy.<ext>}.
+В нем находится класс \texttt{MyStrategy}, в котором содержится метод \texttt{act}, содержащий логику вашей стратегии.
+
+Этод метод будет вызываться каждый тик, для каждого вашего робота отдельно.
+
+\begin{verbatim}
+class MyStrategy:
+      method act(me: Robot, rules: Rules, game: Game, action: Action):
+            // Your implementation
+\end{verbatim}
+
+Параметры в методе \texttt{act}:
+\begin{itemize}
+      \item \texttt{me} --- ваш робот, действие которого сейчас определяется
+      \item \texttt{rules} --- объект, содержащий правила игры (не меняется между тиками)
+      \item \texttt{game} --- объект, содержащий информацию о текущем состоянии игры (меняется между тиками)
+      \item \texttt{action} --- объект, задающий действие вашего робота. Меняя поля этого объекта, вы задаете действие
+\end{itemize}
+
+\section{Action}
+
+Объект, определяющий действие робота.
+
+\begin{verbatim}
+class Action:
+      target_velocity_x: Float      // Координата X желаемого вектора скорости
+      target_velocity_y: Float      // Координата Y желаемого вектора скорости
+      target_velocity_z: Float      // Координата Z желаемого вектора скорости
+      jump_speed: Float             // Желаемая скорость прыжка
+      use_nitro: Bool               // Использовать/не использовать нитро
+\end{verbatim}
+
+\section{Arena}
+
+Объект, определяющий размеры арены (см. \ref{arena_form}).
+
+\begin{verbatim}
+class Arena:
+      width: Float
+      height: Float
+      depth: Float
+      bottom_radius: Float
+      top_radius: Float
+      corner_radius: Float
+      goal_top_radius: Float
+      goal_width: Float
+      goal_height: Float
+      goal_depth: Float
+      goal_side_radius: Float
+\end{verbatim}
+
+\section{Ball}
+
+Объект, определяющий мяч.
+
+\begin{verbatim}
+class Ball:
+      x: Float                      // Текущие координаты центра мяча
+      y: Float
+      z: Float
+      velocity_x: Float             // Текущая скорость мяча
+      velocity_y: Float
+      velocity_z: Float
+      radius: Float                 // Радиус мяча
+\end{verbatim}
+
+\section{Game}
+
+Объект, содержащий себе информацию о текущем состоянии игры.
+
+\begin{verbatim}
+class Game:
+      current_tick: Int             // Номер текущего тика
+      players: Player[]             // Список игроков
+      robots: Robot[]               // Список роботов
+      nitro_packs: NitroPack[]      // Список рюкзаков с нитро
+      ball: Ball                    // Мяч
+\end{verbatim}
+
+\section{NitroPack}
+
+Объект, определяющий рюкзак с нитро.
+
+\begin{verbatim}
+class NitroPack:
+      id: Int
+      x: Float                      // Координаты центра рюкзака
+      y: Float
+      z: Float
+      radius: Float                 // Радиус
+      respawn_ticks: Int?           // Кол-во тиков, через которое рюкзак снова появится
+                                          (или null, если еще не был подобран)
+\end{verbatim}
+
+\section{Player}
+
+Объект, определяющий игрока (стратегию).
+
+\begin{verbatim}
+class Player:
+      id: Int
+      me: Bool                      // true, если это оъект вашего игрока
+      strategy_crashed: Bool
+      score: Int                    // Текущий счет игрока
+\end{verbatim}
+
+\section{Robot}
+
+Объект, определяющий робота.
+
+\begin{verbatim}
+class Robot:
+      id: Int
+      player_id: Int
+      is_teammate: Bool             // true, если это робот вашего игрока
+      x: Float                      // Текущие координаты центра робота
+      y: Float
+      z: Float
+      velocity_x: Float             // Текущая скорость робота
+      velocity_y: Float
+      velocity_z: Float
+      radius: Float                 // Текущий радиус робота
+      nitro_amount: Float           // Текущий запас нитро робота
+      touch: bool                   // true, если робот сейчас касается арены
+      touch_normal_x: Float         // Вектор нормали к точке соприкосновения с ареной
+      touch_normal_y: Float               (или null, если нет касания)
+      touch_normal_z: Float
+\end{verbatim}
+
+\section{Rules}
+
+Объект, задающий данные о мире, не меняющиеся между тиками. Также содержит константы симулятора
+
+\begin{verbatim}
+class Rules:
+      max_tick_count: Int           // Максимальная продолжительность игры
+      arena: Arena                  // Описание размеров арены
+      team_size: Int                // Количество роботов в каждой команде
+
+      // Константы, используемые в симуляторе
+      ROBOT_MIN_RADIUS: Float
+      ROBOT_MAX_RADIUS: Float
+      ROBOT_MAX_JUMP_SPEED: Float
+      ROBOT_ACCELERATION: Float
+      ROBOT_NITRO_ACCELERATION: Float
+      ROBOT_MAX_GROUND_SPEED: Float
+      ROBOT_ARENA_E: Float
+      ROBOT_RADIUS: Float
+      ROBOT_MASS: Float
+      TICKS_PER_SECOND: Int
+      MICROTICKS_PER_TICK: Int
+      RESET_TICKS: Int
+      BALL_ARENA_E: Float
+      BALL_RADIUS: Float
+      BALL_MASS: Float
+      MIN_HIT_E: Float
+      MAX_HIT_E: Float
+      MAX_ENTITY_SPEED: Float
+      MAX_NITRO_AMOUNT: Float
+      START_NITRO_AMOUNT: Float
+      NITRO_POINT_VELOCITY_CHANGE: Float
+      NITRO_PACK_X: Float
+      NITRO_PACK_Y: Float
+      NITRO_PACK_Z: Float
+      NITRO_PACK_RADIUS: Float
+      NITRO_PACK_AMOUNT: Float
+      NITRO_PACK_RESPAWN_TICKS: Int
+      GRAVITY: Float
+\end{verbatim}

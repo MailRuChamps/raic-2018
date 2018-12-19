@@ -13,6 +13,13 @@ const int32 BUFFER_SIZE = 8 * 1024;
 
 string RemoteProcessClient::readline() {
     while (true) {
+        size_t eol = buffer.find('\n');
+        if (eol != string::npos) {
+            string line = buffer.substr(0, eol);
+            buffer = buffer.substr(eol + 1);
+            cerr << "Got line: " << line.substr(0, 20) << endl;
+            return line;
+        }
         int32 received = socket.Receive(BUFFER_SIZE);
         if (received < 0) {
             cerr << "Error reading from socket" << endl;
@@ -21,14 +28,7 @@ string RemoteProcessClient::readline() {
         if (received == 0) {
             return "";
         }
-        size_t cur_pos = buffer.length();
         buffer.append(socket.GetData(), socket.GetData() + received);
-        size_t eol = buffer.find('\n', cur_pos);
-        if (eol != string::npos) {
-            string line = buffer.substr(0, eol);
-            buffer = buffer.substr(eol + 1);
-            return line;
-        }
     }
 }
 

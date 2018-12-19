@@ -1,3 +1,3 @@
 set -ex
 
-/output/my-strategy "$@"
+cd /output && ./my-strategy "$@"

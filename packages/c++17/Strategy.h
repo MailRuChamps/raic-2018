@@ -12,7 +12,7 @@
 
 class Strategy {
 public:
-    virtual void act(const model::Robot& me, const model::Rules& rules, const model::Game& world, model::Action& action) = 0;
+    virtual void act(const model::Robot& me, const model::Rules& rules, const model::Game& game, model::Action& action) = 0;
 
     virtual ~Strategy();
 };
