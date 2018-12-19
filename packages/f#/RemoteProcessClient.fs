@@ -28,16 +28,16 @@ module RemoteProcessClient =
         let writer = new StreamWriter(client.GetStream())
         writer.WriteLine("json")
         writer.Flush()
-        log "create" (host + (string port))
+        //log "create" (host + (string port))
         { Client = client; Reader = reader; Writer = writer }
 
     let read rpc : 'a option = 
         let line = rpc.Reader.ReadLine()
         if line = null || line.Length = 0 then
-            log "read" "None"
+            //log "read" "None"
             None
         else 
-            log "read" line
+            //log "read" line
             Json.deserialize line 
             |> Some
 
@@ -47,11 +47,11 @@ module RemoteProcessClient =
 
     let write rpc actions = 
         let json = Json.serializeU actions
-        log "write" json
+        //log "write" json
         rpc.Writer.WriteLine json
         rpc.Writer.Flush()
 
     let writeToken rpc (token : string) = 
-        log "writeToken" token
+        //log "writeToken" token
         rpc.Writer.WriteLine(token)
         rpc.Writer.Flush()

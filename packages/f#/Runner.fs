@@ -19,19 +19,19 @@ module Runner =
 
     let startRunner rpc token = 
         RemoteProcessClient.writeToken rpc token
-        log "startRunner" token
+        //log "startRunner" token
 
-        log "startRunner" "read rules"
+        //log "startRunner" "read rules"
         let rules = RemoteProcessClient.readRules rpc |> Option.get
-        log "startRunner" "read game"
+        //log "startRunner" "read game"
         let gameOpt = RemoteProcessClient.readGame rpc 
         
         let rec iterRunner = function
             | _, None -> 
-                log "iterRunner" "None game"
+                //log "iterRunner" "None game"
                 ()
             | acc, Some game -> 
-                log "iterRunner" ("tick = " + (string game.current_tick))
+                //log "iterRunner" ("tick = " + (string game.current_tick))
                 let acc, actions = iteration acc rules game
                 RemoteProcessClient.write rpc actions
                 let gameOpt = RemoteProcessClient.readGame rpc
@@ -41,7 +41,7 @@ module Runner =
     
     [<EntryPoint>]
     let main(args : string array) = 
-        log "main" "start"
+        //log "main" "start"
         if Array.length args = 3 then
             startRunner 
             <| RemoteProcessClient.create args.[0] (int args.[1])
@@ -50,6 +50,6 @@ module Runner =
             startRunner
             <| RemoteProcessClient.create "127.0.0.1" 31001
             <| "0000000000000000"
-        log "main" "end"
+        //log "main" "end"
         0        
     
