@@ -18,7 +18,7 @@ module Action =
     let target_velocity act = Vector3(float32 act.target_velocity_x, float32 act.target_velocity_y, float32 act.target_velocity_z)
     let target_velocity2 act = Vector2(float32 act.target_velocity_x, float32 act.target_velocity_z)
 
-    let fromVector3 (v3 : Vector3) jump_speed use_nitro = {
+    let fromVelocity (v3 : Vector3) jump_speed use_nitro = {
         target_velocity_x = float v3.X
         target_velocity_y = float v3.Y
         target_velocity_z = float v3.Z
@@ -26,7 +26,7 @@ module Action =
         use_nitro = use_nitro
     }
 
-    let fromVector2 (v2 : Vector2) jump_speed use_nitro = {
+    let fromVelocity2 (v2 : Vector2) jump_speed use_nitro = {
         target_velocity_x = float v2.X
         target_velocity_y = 0.0
         target_velocity_z = float v2.Y
