@@ -5,6 +5,7 @@ namespace Com.CodeGame.CodeBall2018.DevKit.CSharpCgdk.Model
         public int max_tick_count;
         public Arena arena;
         public int team_size;
+        public long seed;
         public double ROBOT_MIN_RADIUS;
         public double ROBOT_MAX_RADIUS;
         public double ROBOT_MAX_JUMP_SPEED;

@@ -6,6 +6,7 @@ pub struct Rules {
     pub max_tick_count: i32,
     pub arena: Arena,
     pub team_size: i32,
+    pub seed: i64,
     pub ROBOT_MIN_RADIUS: f64,
     pub ROBOT_MAX_RADIUS: f64,
     pub ROBOT_MAX_JUMP_SPEED: f64,

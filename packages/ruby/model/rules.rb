@@ -4,6 +4,7 @@ class Rules
     attr_reader :max_tick_count
     attr_reader :arena
     attr_reader :team_size
+    attr_reader :seed
     attr_reader :ROBOT_MIN_RADIUS
     attr_reader :ROBOT_MAX_RADIUS
     attr_reader :ROBOT_MAX_JUMP_SPEED
@@ -36,6 +37,7 @@ class Rules
         @max_tick_count = json["max_tick_count"]
         @arena = Arena.new(json["arena"])
         @team_size = json["team_size"]
+        @seed = json["seed"]
         @ROBOT_MIN_RADIUS = json["ROBOT_MIN_RADIUS"]
         @ROBOT_MAX_RADIUS = json["ROBOT_MAX_RADIUS"]
         @ROBOT_MAX_JUMP_SPEED = json["ROBOT_MAX_JUMP_SPEED"]

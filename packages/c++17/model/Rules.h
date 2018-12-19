@@ -13,6 +13,7 @@ namespace model {
         int max_tick_count;
         Arena arena;
         int team_size;
+        long long seed;
         double ROBOT_MIN_RADIUS;
         double ROBOT_MAX_RADIUS;
         double ROBOT_MAX_JUMP_SPEED;
@@ -46,6 +47,7 @@ namespace model {
             max_tick_count = json["max_tick_count"].GetInt();
             arena.read(json["arena"]);
             team_size = json["team_size"].GetInt();
+            seed = json["seed"].GetInt64();
             ROBOT_MIN_RADIUS = json["ROBOT_MIN_RADIUS"].GetDouble();
             ROBOT_MAX_RADIUS = json["ROBOT_MAX_RADIUS"].GetDouble();
             ROBOT_MAX_JUMP_SPEED = json["ROBOT_MAX_JUMP_SPEED"].GetDouble();

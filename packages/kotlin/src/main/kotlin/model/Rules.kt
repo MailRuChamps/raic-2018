@@ -4,6 +4,7 @@ class Rules {
     var max_tick_count: Int = 0
     lateinit var arena: Arena
     var team_size: Int = 0
+    var seed: Long = 0
     var ROBOT_MIN_RADIUS: Double = 0
     var ROBOT_MAX_RADIUS: Double = 0
     var ROBOT_MAX_JUMP_SPEED: Double = 0

@@ -6,6 +6,7 @@ class Rules:
         self.max_tick_count = json.get("max_tick_count")
         self.arena = Arena(json.get("arena"))
         self.team_size = json.get("team_size")
+        self.seed = json.get("seed")
         self.ROBOT_MIN_RADIUS = json.get("ROBOT_MIN_RADIUS")
         self.ROBOT_MAX_RADIUS = json.get("ROBOT_MAX_RADIUS")
         self.ROBOT_MAX_JUMP_SPEED = json.get("ROBOT_MAX_JUMP_SPEED")
