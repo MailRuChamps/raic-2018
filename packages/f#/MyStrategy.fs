@@ -37,6 +37,11 @@ module MyStrategy =
         |> sprintf "%s is %s" name_obj
         |> log "json"
 
+    let logFloat name_obj x =
+        string x
+        |> sprintf "%s is %s" name_obj
+        |> log "json"
+
 
     let private EPS = 0.1
 
@@ -100,15 +105,15 @@ module MyStrategy =
         let me_pos2d = Robot.position2 me
         let inSim (pos : Vector3, time : float) = 
             logJson "pos" { x = float pos.X; y = float pos.Y; z = float pos.Z }
-            logJson "time" time
+            logFloat "time" time
             let pos2d = Vector2(pos.X, pos.Z)
             logJson "pos2d" { x = float pos2d.X; y = float pos2d.Y }
             let delta = pos2d - me_pos2d
             let need_speed = float (delta.Length()) / time
             let mx_speed = ROBOT_MAX_GROUND_SPEED
             logJson "delta" { x = float delta.X; y = float delta.Y }
-            logJson "need_speed" need_speed
-            logJson "mx_speed" mx_speed
+            logFloat "need_speed" need_speed
+            logFloat "mx_speed" mx_speed
             if 0.5 * mx_speed < need_speed && need_speed < mx_speed then
                 let velocity_target = Vector2.Normalize(delta) * (float32 need_speed)
                 Action.fromVector2 velocity_target jump_speed true
