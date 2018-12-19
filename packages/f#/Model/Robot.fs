@@ -4,18 +4,18 @@ type Robot = {
     id : int
     player_id : int
     is_teammate : bool
-    x : float32
-    y : float32
-    z : float32
-    velocity_x : float32
-    velocity_y : float32
-    velocity_z : float32
-    radius : float32
-    nitro_amount : float32
+    x : float
+    y : float
+    z : float
+    velocity_x : float
+    velocity_y : float
+    velocity_z : float
+    radius : float
+    nitro_amount : float
     touch : bool
-    touch_normal_x : float32 option
-    touch_normal_y : float32 option
-    touch_normal_z : float32 option
+    touch_normal_x : float option
+    touch_normal_y : float option
+    touch_normal_z : float option
 }
 
 open System.Numerics
@@ -30,15 +30,15 @@ module Robot =
     let y robot = robot.y
     let z robot = robot.z
 
-    let position robot = Vector3(robot.x, robot.y, robot.z)
-    let position2 robot = Vector2(robot.x, robot.z)
+    let position robot = Vector3(float32 robot.x, float32 robot.y, float32 robot.z)
+    let position2 robot = Vector2(float32 robot.x, float32 robot.z)
 
     let velocity_x robot = robot.velocity_x
     let velocity_y robot = robot.velocity_y
     let velocity_z robot = robot.velocity_z
     
-    let velocity robot = Vector3(robot.velocity_x, robot.velocity_y, robot.velocity_z)
-    let velocity2 robot = Vector2(robot.velocity_x, robot.velocity_z)
+    let velocity robot = Vector3(float32 robot.velocity_x, float32 robot.velocity_y, float32 robot.velocity_z)
+    let velocity2 robot = Vector2(float32 robot.velocity_x, float32 robot.velocity_z)
 
     let radius robot = robot.radius
 

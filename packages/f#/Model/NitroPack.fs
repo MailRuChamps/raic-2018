@@ -2,11 +2,11 @@ namespace FSharpCgdk.Model
 
 type NitroPack = {
     id : int
-    x : float32
-    y : float32
-    z : float32
-    radius : float32
-    nitro_amount : float32
+    x : float
+    y : float
+    z : float
+    radius : float
+    nitro_amount : float
     respawn_ticks : int option
 }
 
@@ -19,8 +19,8 @@ module NitroPack =
     let y nitro = nitro.y
     let z nitro = nitro.z
     
-    let position nitro = Vector3(nitro.x, nitro.y, nitro.z)
-    let position2 nitro = Vector2(nitro.x, nitro.z)
+    let position nitro = Vector3(float32 nitro.x, float32 nitro.y, float32 nitro.z)
+    let position2 nitro = Vector2(float32 nitro.x, float32 nitro.z)
 
     let radius nitro = nitro.radius
     let nitro_amount nitro = nitro.nitro_amount

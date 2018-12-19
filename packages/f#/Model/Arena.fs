@@ -1,17 +1,17 @@
 namespace FSharpCgdk.Model
 
 type Arena = {
-    width : float32
-    height : float32
-    depth : float32
-    bottom_radius : float32
-    top_radius : float32
-    corner_radius : float32
-    goal_top_radius : float32
-    goal_width : float32
-    goal_height : float32
-    goal_depth : float32
-    goal_side_radius : float32
+    width : float
+    height : float
+    depth : float
+    bottom_radius : float
+    top_radius : float
+    corner_radius : float
+    goal_top_radius : float
+    goal_width : float
+    goal_height : float
+    goal_depth : float
+    goal_side_radius : float
 }
 
 
