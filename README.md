@@ -10,6 +10,9 @@ The beta test will run until 21:00 UTC on December 23. Please note that at this 
 Some links on the website are not working. We will fix it within a few days.
 Good luck and have fun!
 
+## UPDATE 19.12.18
+[Here](https://github.com/MailRuChamps/raic/blob/master/UPDATE-19.12.md) you can read about updates.
+
 ## Useful links
 1. About [CodeBall](http://russianaicup.ru). News, Notifications;
 2. Quick start [instructions](http://russianaicup.ru/p/quick). Other sources will be published soon on this repository and [here](http://russianaicup.ru/p/examples);

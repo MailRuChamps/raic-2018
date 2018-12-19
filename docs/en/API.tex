@@ -1,0 +1,173 @@
+\chapter{API description}\label{api}
+
+\section{MyStrategy}
+
+In language pack for your programming language you can find file named\texttt{MyStrategy/my\_strategy.<ext>}.
+This file contains class \texttt{MyStrategy} with \texttt{act} method, where your strategy's logic should be implementeed.
+
+This method will be called each tick, separately for each of your robots.
+
+\begin{verbatim}
+class MyStrategy:
+      method act(me: Robot, rules: Rules, game: Game, action: Action):
+            // Your implementation
+\end{verbatim}
+
+\texttt{act} parameters:
+\begin{itemize}
+      \item \texttt{me} --- your robot, for who the action is being determined
+      \item \texttt{rules} --- object, containing rules of the game (does not change between ticks)
+      \item \texttt{game} --- object, containing information about current state of the game (changes between ticks)
+      \item \texttt{action} --- object describing robot's action. By changing it's fields you set up action for your robot.
+\end{itemize}
+
+\section{Action}
+
+Object describing robot's action.
+
+\begin{verbatim}
+class Action:
+      target_velocity_x: Float      // X coordinate of target velocity
+      target_velocity_y: Float      // Y coordinate of target velocity
+      target_velocity_z: Float      // Z coordinate of target velocity
+      jump_speed: Float             // Jump speed
+      use_nitro: Bool               // Whether nitro should be used
+\end{verbatim}
+
+\section{Arena}
+
+Object describing arena dimensions (look \ref{arena_form}).
+
+\begin{verbatim}
+class Arena:
+      width: Float
+      height: Float
+      depth: Float
+      bottom_radius: Float
+      top_radius: Float
+      corner_radius: Float
+      goal_top_radius: Float
+      goal_width: Float
+      goal_height: Float
+      goal_depth: Float
+      goal_side_radius: Float
+\end{verbatim}
+
+\section{Ball}
+
+Object describing the ball.
+
+\begin{verbatim}
+class Ball:
+      x: Float                      // Current coordinates of the ball's center
+      y: Float
+      z: Float
+      velocity_x: Float             // Current ball's velocity
+      velocity_y: Float
+      velocity_z: Float
+      radius: Float                 // Ball's radius
+\end{verbatim}
+
+\section{Game}
+
+Object containing information about current game state.
+
+\begin{verbatim}
+class Game:
+      current_tick: Int             // Current tick index
+      players: Player[]             // List of players
+      robots: Robot[]               // List of robots
+      nitro_packs: NitroPack[]      // List of nitro packs
+      ball: Ball                    // The ball
+\end{verbatim}
+
+\section{NitroPack}
+
+Object describing a nitro pack.
+
+\begin{verbatim}
+class NitroPack:
+      id: Int
+      x: Float                      // Coordinates of the center of the pack
+      y: Float
+      z: Float
+      radius: Float                 // Radius
+      respawn_ticks: Int?           // Number of ticks until respawn
+                                          (or null, if not picked up yet)
+\end{verbatim}
+
+\section{Player}
+
+Object describing player (strategy).
+
+\begin{verbatim}
+class Player:
+      id: Int
+      me: Bool                      // true, if this is you
+      strategy_crashed: Bool
+      score: Int                    // Current score
+\end{verbatim}
+
+\section{Robot}
+
+Object describing a robot.
+
+\begin{verbatim}
+class Robot:
+      id: Int
+      player_id: Int                // Controlling player's id
+      is_teammate: Bool             // true, if this robot is controlled by you
+      x: Float                      // Current coordinates of robot's center
+      y: Float
+      z: Float
+      velocity_x: Float             // Current velocity
+      velocity_y: Float
+      velocity_z: Float
+      radius: Float                 // Current radius
+      nitro_amount: Float           // Current nitro amount
+      touch: bool                   // true, if robot currently touches arena
+      touch_normal_x: Float         // Normal to the touch surface
+      touch_normal_y: Float               (or null, is no touching)
+      touch_normal_z: Float
+\end{verbatim}
+
+\section{Rules}
+
+Object describing rules (persistent game properties). Also contains constants used in simulation
+
+\begin{verbatim}
+class Rules:
+      max_tick_count: Int           // Maximal game length in ticks
+      arena: Arena                  // Arena dimensions
+      team_size: Int                // Number of robots in each team
+
+      // Constants used in simulation
+      ROBOT_MIN_RADIUS: Float
+      ROBOT_MAX_RADIUS: Float
+      ROBOT_MAX_JUMP_SPEED: Float
+      ROBOT_ACCELERATION: Float
+      ROBOT_NITRO_ACCELERATION: Float
+      ROBOT_MAX_GROUND_SPEED: Float
+      ROBOT_ARENA_E: Float
+      ROBOT_RADIUS: Float
+      ROBOT_MASS: Float
+      TICKS_PER_SECOND: Int
+      MICROTICKS_PER_TICK: Int
+      RESET_TICKS: Int
+      BALL_ARENA_E: Float
+      BALL_RADIUS: Float
+      BALL_MASS: Float
+      MIN_HIT_E: Float
+      MAX_HIT_E: Float
+      MAX_ENTITY_SPEED: Float
+      MAX_NITRO_AMOUNT: Float
+      START_NITRO_AMOUNT: Float
+      NITRO_POINT_VELOCITY_CHANGE: Float
+      NITRO_PACK_X: Float
+      NITRO_PACK_Y: Float
+      NITRO_PACK_Z: Float
+      NITRO_PACK_RADIUS: Float
+      NITRO_PACK_AMOUNT: Float
+      NITRO_PACK_RESPAWN_TICKS: Int
+      GRAVITY: Float
+\end{verbatim}
