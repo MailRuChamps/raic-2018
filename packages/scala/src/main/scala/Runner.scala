@@ -21,7 +21,8 @@ class Runner(args : Array[String])  {
       actions = Map()
       for (robot <- game.robots) {
         if (robot.is_teammate) {
-          val action = strategy.act(robot, rules, game)
+          val action = Action()
+          strategy.act(robot, rules, game, action)
           actions = actions.updated(robot.id, action)
         }
       }

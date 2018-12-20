@@ -1,7 +1,7 @@
 package model
 
-case class Action(target_velocity_x: Double,
-                  target_velocity_y: Double,
-                  target_velocity_z: Double,
-                  jump_speed: Double,
-                  use_nitro: Boolean)
+case class Action(var target_velocity_x: Double = 0,
+                  var target_velocity_y: Double = 0,
+                  var target_velocity_z: Double = 0,
+                  var jump_speed: Double = 0,
+                  var use_nitro: Boolean = false)
