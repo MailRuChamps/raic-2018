@@ -10,7 +10,7 @@ module Runner =
             acc, Map.add (string robot.id) action actions
         game.robots
         |> Array.filter (fun x -> x.is_teammate)
-        |> Array.fold processRobot (EmptyData, Map.empty)
+        |> Array.fold processRobot (acc, Map.empty)
 
 
     let startRunner rpc token = 
@@ -28,17 +28,17 @@ module Runner =
                 iterRunner (acc, gameOpt)
 
         iterRunner (EmptyData, gameOpt)
+
     
+    let templateArgs = "127.0.0.1", "31001", "0000000000000000"
     
     [<EntryPoint>]
     let main(args : string array) = 
-        if Array.length args = 3 then
-            startRunner 
-            <| RemoteProcessClient.create args.[0] (int args.[1])
-            <| args.[2]
-        else
-            startRunner
-            <| RemoteProcessClient.create "127.0.0.1" 31001
-            <| "0000000000000000"
-        0        
+        let host, port, token = 
+            match args with
+            | [| host; port; token |] -> host, port, token
+            | otherwise -> templateArgs
+        let rpc = RemoteProcessClient.create host (int port)
+        startRunner rpc token   
+        0  
     
