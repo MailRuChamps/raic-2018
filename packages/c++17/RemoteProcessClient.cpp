@@ -17,7 +17,6 @@ string RemoteProcessClient::readline() {
         if (eol != string::npos) {
             string line = buffer.substr(0, eol);
             buffer = buffer.substr(eol + 1);
-            cerr << "Got line: " << line.substr(0, 20) << endl;
             return line;
         }
         int32 received = socket.Receive(BUFFER_SIZE);
