@@ -10,7 +10,8 @@ type StrategyData =
     | KnownAttackBot of forTick: int * botId : int 
 
 
-type ActData = Robot * Rules * Game * StrategyData
+type ActData = Robot * Rules * Game * Action
+
 
 module MyStrategy = 
     let private EPS = 0.1
@@ -36,6 +37,9 @@ module MyStrategy =
 
     let private isNormalSpeed max_speed speed = 
         0.5 * max_speed < speed && speed < max_speed
+
+
+    let mutable data : StrategyData = EmptyData
 
 
     let protectAct (args : ActData) : Action =
@@ -74,7 +78,7 @@ module MyStrategy =
         }
 
 
-    let attackEntryPoint (me, rules, game, _) : Action option = 
+    let attackEntryPoint (me, rules, game, action) : Action option = 
         let delta = (posFromBall game.ball) - (posFromRobot me)
 
         let dist_for_jump = rules.ROBOT_RADIUS + rules.BALL_RADIUS
@@ -126,7 +130,7 @@ module MyStrategy =
         | None -> protectAct args
     
 
-    let (|AttackBot|ProtectBot|) (robot : Robot, data : StrategyData) =
+    let (|AttackBot|ProtectBot|) (robot : Robot) =
         match data with
         | EmptyData -> failwith "EmptyData at (|AttackBot|ProtectBot|). Error!!!"
         | KnownAttackBot (tick, id) when id = robot.id -> AttackBot
@@ -137,7 +141,7 @@ module MyStrategy =
 
 
     let nextData (args : ActData) : StrategyData = 
-        let _, _, game, data = args
+        let _, _, game, _ = args
         let cur_tick = game.current_tick
         match data with
         | KnownAttackBot(tick, _) when tick = cur_tick -> data
@@ -150,11 +154,17 @@ module MyStrategy =
             |> KnownAttackBot
 
 
-    let act (me : Robot, rules : Rules, game : Game, data : StrategyData) : Action * StrategyData =
-        let data = nextData (me, rules, game, data)
-        let args = me, rules, game, data
-        let action = 
-            match me, data with
-            | AttackBot  -> attackAct args
-            | ProtectBot -> protectAct args
-        action, data
+    let assignFieldsAction toActoin fromAction = 
+        toActoin.target_velocity_x <- fromAction.target_velocity_x
+        toActoin.target_velocity_y <- fromAction.target_velocity_y
+        toActoin.target_velocity_z <- fromAction.target_velocity_z
+        toActoin.jump_speed <- fromAction.jump_speed
+        toActoin.use_nitro <- fromAction.use_nitro
+
+    let act (me : Robot, rules : Rules, game : Game, action : Action) =
+        data <- nextData (me, rules, game, action)
+        let args = me, rules, game, action
+        match me with
+        | AttackBot  -> attackAct args
+        | ProtectBot -> protectAct args
+        |> assignFieldsAction action
