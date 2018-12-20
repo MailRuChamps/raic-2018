@@ -15,5 +15,4 @@ type Robot = {
     touch : bool
     touch_normal_x : float option
     touch_normal_y : float option
-    touch_normal_z : float option
-}
+    touch_normal_z : float option }

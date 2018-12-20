@@ -4,7 +4,7 @@ open System.Collections.Generic
 open FSharpCgdk.Model
 
 module Runner = 
-    let private iteration acc rules game =
+    let private iteration (acc : StrategyData) (rules : Rules) (game : Game)  =
         let processRobot (acc, actions) robot = 
             let action, acc = MyStrategy.act(robot, rules, game, acc)
             acc, Map.add (string robot.id) action actions
@@ -41,4 +41,3 @@ module Runner =
         let rpc = RemoteProcessClient.create host (int port)
         startRunner rpc token   
         0  
-    

@@ -7,5 +7,4 @@ type Ball = {
     velocity_x : float
     velocity_y : float
     velocity_z : float
-    radius : float
-}
+    radius : float }

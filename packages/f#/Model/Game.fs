@@ -5,5 +5,4 @@ type Game = {
     players : Player array
     robots : Robot array
     nitro_packs : NitroPack array
-    ball : Ball
-}
+    ball : Ball }

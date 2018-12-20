@@ -7,5 +7,4 @@ type NitroPack = {
     z : float
     radius : float
     nitro_amount : float
-    respawn_ticks : int option
-}
+    respawn_ticks : int option }

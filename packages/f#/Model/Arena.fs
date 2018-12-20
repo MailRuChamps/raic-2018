@@ -11,5 +11,4 @@ type Arena = {
     goal_width : float
     goal_height : float
     goal_depth : float
-    goal_side_radius : float
-}
+    goal_side_radius : float }

@@ -32,5 +32,4 @@ type Rules = {
     NITRO_PACK_RADIUS : float
     NITRO_PACK_AMOUNT : float
     NITRO_PACK_RESPAWN_TICKS : int
-    GRAVITY : float
-}
+    GRAVITY : float }

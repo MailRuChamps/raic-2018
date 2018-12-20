@@ -4,5 +4,4 @@ type Player = {
     id : int
     me : bool
     strategy_crashed : bool
-    score : int
-}
+    score : int }
