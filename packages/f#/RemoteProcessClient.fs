@@ -12,8 +12,7 @@ open FSharpCgdk.Model
 type RemoteProcessClient = {
     Client : TcpClient
     Reader : StreamReader
-    Writer : StreamWriter
-}
+    Writer : StreamWriter }
 
 
 module RemoteProcessClient = 

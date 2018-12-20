@@ -4,30 +4,31 @@ open System.Collections.Generic
 open FSharpCgdk.Model
 
 module Runner = 
-    let private iteration (acc : StrategyData) (rules : Rules) (game : Game)  =
-        let processRobot (acc, actions) robot = 
-            let action, acc = MyStrategy.act(robot, rules, game, acc)
-            acc, Map.add (string robot.id) action actions
-        game.robots
-        |> Array.filter (fun x -> x.is_teammate)
-        |> Array.fold processRobot (acc, Map.empty)
+    let emptyAction() = {
+        target_velocity_x = 0.0
+        target_velocity_y = 0.0
+        target_velocity_z = 0.0
+        jump_speed = 0.0
+        use_nitro = false }
 
 
     let startRunner rpc token = 
         RemoteProcessClient.writeToken rpc token
 
         let rules = RemoteProcessClient.readRules rpc |> Option.get
-        let gameOpt = RemoteProcessClient.readGame rpc 
-        
-        let rec iterRunner = function
-            | _, None -> ()
-            | acc, Some game -> 
-                let acc, actions = iteration acc rules game
-                RemoteProcessClient.write rpc actions
-                let gameOpt = RemoteProcessClient.readGame rpc
-                iterRunner (acc, gameOpt)
+        let mutable gameOpt = RemoteProcessClient.readGame rpc 
+        let mutable actions = Map.empty
 
-        iterRunner (EmptyData, gameOpt)
+        while gameOpt <> None do 
+            actions <- Map.empty
+            let game = Option.get gameOpt
+            let teammates = game.robots |> Array.filter (fun x -> x.is_teammate)        
+            for robot in teammates do 
+                let action = emptyAction()
+                MyStrategy.act(robot, rules, game, action)
+                actions <- Map.add (string robot.id) action actions
+            RemoteProcessClient.write rpc actions
+            gameOpt <- RemoteProcessClient.readGame rpc
 
     
     let templateArgs = "127.0.0.1", "31001", "0000000000000000"
