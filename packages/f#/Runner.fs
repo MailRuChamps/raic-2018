@@ -12,11 +12,11 @@ module Runner =
         use_nitro = false }
 
 
-    let startRunner rpc token = 
-        RemoteProcessClient.writeToken rpc token
+    let startRunner (rpc : RemoteProcessClient) (token : string) = 
+        rpc.writeToken token
 
-        let rules = RemoteProcessClient.readRules rpc |> Option.get
-        let mutable gameOpt = RemoteProcessClient.readGame rpc 
+        let rules = rpc.readRules() |> Option.get
+        let mutable gameOpt = rpc.readGame() 
         let mutable actions = Map.empty
 
         while gameOpt <> None do 
@@ -27,8 +27,8 @@ module Runner =
                 let action = emptyAction()
                 MyStrategy.act(robot, rules, game, action)
                 actions <- Map.add (string robot.id) action actions
-            RemoteProcessClient.write rpc actions
-            gameOpt <- RemoteProcessClient.readGame rpc
+            rpc.write actions
+            gameOpt <- rpc.readGame()
 
     
     let templateArgs = "127.0.0.1", "31001", "0000000000000000"
@@ -39,6 +39,6 @@ module Runner =
             match args with
             | [| host; port; token |] -> host, port, token
             | otherwise -> templateArgs
-        let rpc = RemoteProcessClient.create host (int port)
+        let rpc = RemoteProcessClient(host, int port)
         startRunner rpc token   
         0  

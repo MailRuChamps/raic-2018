@@ -9,44 +9,38 @@ open FSharp.Json
 open FSharpCgdk.Model
 
 
-type RemoteProcessClient = {
-    Client : TcpClient
-    Reader : StreamReader
-    Writer : StreamWriter }
-
-
-module RemoteProcessClient = 
-
-    let create host port = 
-        let client = new TcpClient(host, port)
-        client.NoDelay <- true
-        let reader = new StreamReader(client.GetStream())
-        let writer = new StreamWriter(client.GetStream())
+type RemoteProcessClient(host, port) = 
+    let client = new TcpClient(host, port)
+    do client.NoDelay <- true
+    let reader = new StreamReader(client.GetStream())
+    let writer = new StreamWriter(client.GetStream())
+    do 
         writer.WriteLine("json")
         writer.Flush()
-        { Client = client; Reader = reader; Writer = writer }
 
 
-    let read rpc : 'a option = 
-        let line = rpc.Reader.ReadLine()
+    member this.readGame() : Game option = 
+        let line = reader.ReadLine()
         if line = null || line.Length = 0 then
             None
         else 
             Some (Json.deserialize line)
 
 
-    let readGame rpc : Game option = read rpc
+    member this.readRules() : Rules option = 
+        let line = reader.ReadLine()
+        if line = null || line.Length = 0 then
+            None
+        else 
+            Some (Json.deserialize line)
 
 
-    let readRules rpc : Rules option = read rpc
-
-
-    let write rpc actions = 
+    member this.write (actions : Map<string, Action>) = 
         let json = Json.serializeU actions
-        rpc.Writer.WriteLine json
-        rpc.Writer.Flush()
+        writer.WriteLine json
+        writer.Flush()
 
 
-    let writeToken rpc (token : string) = 
-        rpc.Writer.WriteLine(token)
-        rpc.Writer.Flush()
+    member this.writeToken (token : string) = 
+        writer.WriteLine token
+        writer.Flush()
