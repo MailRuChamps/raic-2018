@@ -38,10 +38,12 @@ constructor(host: String, port: Int) {
     }
 
     @Throws(IOException::class)
-    fun write(actions: Map<Int, Action>) {
+    fun write(actions: Map<Int, Action>, customRendering: String) {
         val json = gson.toJson(actions)
         output.write(json)
-        output.write("\n")
+        output.write("|")
+        output.write(customRendering)
+        output.write("\n<end>\n")
         output.flush()
     }
 

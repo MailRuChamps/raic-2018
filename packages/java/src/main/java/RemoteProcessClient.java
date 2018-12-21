@@ -35,10 +35,12 @@ public final class RemoteProcessClient {
         return gson.fromJson(line, Rules.class);
     }
 
-    public void write(Map<Integer, Action> actions) throws IOException {
+    public void write(Map<Integer, Action> actions, String customRendering) throws IOException {
         String json = gson.toJson(actions);
         output.write(json);
-        output.write("\n");
+        output.write("|");
+        output.write(customRendering);
+        output.write("\n<end>\n");
         output.flush();
     }
 

@@ -26,7 +26,7 @@ class Runner(args : Array[String])  {
           actions = actions.updated(robot.id, action)
         }
       }
-      remoteProcessClient.write(actions)
+      remoteProcessClient.write(actions, strategy.customRendering())
       game = remoteProcessClient.readGame()
     }
   }

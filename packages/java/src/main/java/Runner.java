@@ -32,7 +32,7 @@ public final class Runner {
                     actions.put(robot.id, action);
                 }
             }
-            remoteProcessClient.write(actions);
+            remoteProcessClient.write(actions, strategy.customRendering());
         }
     }
 }

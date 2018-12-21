@@ -31,10 +31,12 @@ class RemoteProcessClient:
         line = self.reader.readline()
         return Rules(json.loads(line)) if line else None
 
-    def write(self, actions):
+    def write(self, actions, custom_rendering):
         self.writer.write(json.dumps(
             actions, separators=(',', ':'), cls=JSONEncoder))
-        self.writer.write('\n')
+        self.writer.write('|')
+        self.writer.write(custom_rendering)
+        self.writer.write('\n<end>\n')
         self.writer.flush()
 
     def write_token(self, token):

@@ -29,10 +29,12 @@ class RemoteProcessClient(host: String, port: Int) {
     gson.fromJson(line, classOf[Rules])
   }
 
-  def write(actions: Map[Int, Action]): Unit = {
+  def write(actions: Map[Int, Action], customRendering: String): Unit = {
     val json = gson.toJson(actions.asJava)
     output.write(json)
-    output.write("\n")
+    output.write("|")
+    output.write(customRendering);
+    output.write("\n<end>\n")
     output.flush()
   }
 

@@ -46,9 +46,9 @@ namespace Com.CodeGame.CodeBall2018.DevKit.CSharpCgdk
             }
         }
 
-        public void Write(IDictionary<int, Model.Action> actions)
+        public void Write(IDictionary<int, Model.Action> actions, string custom_rendering)
         {
-            writer.WriteLine(JsonConvert.SerializeObject(actions));
+            writer.WriteLine(JsonConvert.SerializeObject(actions) + "|" + custom_rendering + "\n<end>");
             writer.Flush();
         }
 
