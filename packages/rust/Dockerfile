@@ -1,4 +1,4 @@
-FROM rust:1.30
+FROM rust:1.31
 
 COPY . /project
 WORKDIR /project
