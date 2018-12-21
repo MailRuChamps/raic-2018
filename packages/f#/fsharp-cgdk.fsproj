@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Json" Version="0.3.4" />
+    <Compile Include="Model/Action.fs" />
+    <Compile Include="Model/Arena.fs" />
+    <Compile Include="Model/Ball.fs" />
+    <Compile Include="Model/NitroPack.fs" />
+    <Compile Include="Model/Robot.fs" />
+    <Compile Include="Model/Player.fs" />
+    <Compile Include="Model/Rules.fs" />
+    <Compile Include="Model/Game.fs" />
+    <Compile Include="MyStrategy.fs" />
+    <Compile Include="RemoteProcessClient.fs" />
+    <Compile Include="Runner.fs" />
+  </ItemGroup>
+
+</Project>
