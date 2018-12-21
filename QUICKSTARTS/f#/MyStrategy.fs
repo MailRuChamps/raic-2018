@@ -164,7 +164,8 @@ module MyStrategy =
     let act (me : Robot, rules : Rules, game : Game, action : Action) =
         data <- nextData (me, rules, game, action)
         let args = me, rules, game, action
-        match me with
-        | AttackBot  -> attackAct args
-        | ProtectBot -> protectAct args
-        |> assignFieldsAction action
+        let newAction =         
+            match me with
+            | AttackBot  -> attackAct args
+            | ProtectBot -> protectAct args
+        assignFieldsAction action newAction
