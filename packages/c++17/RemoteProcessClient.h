@@ -24,7 +24,7 @@ public:
     RemoteProcessClient(std::string host, int port);
     std::unique_ptr<model::Rules> read_rules();
     std::unique_ptr<model::Game> read_game();
-    void write(const std::unordered_map<int, model::Action>& actions);
+    void write(const std::unordered_map<int, model::Action>& actions, const std::string& custom_rendering);
     void write_token(const std::string& token);
 };
 

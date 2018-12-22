@@ -17,7 +17,6 @@ string RemoteProcessClient::readline() {
         if (eol != string::npos) {
             string line = buffer.substr(0, eol);
             buffer = buffer.substr(eol + 1);
-            cerr << "Got line: " << line.substr(0, 20) << endl;
             return line;
         }
         int32 received = socket.Receive(BUFFER_SIZE);
@@ -76,7 +75,7 @@ unique_ptr<Game> RemoteProcessClient::read_game() {
     return result;
 }
 
-void RemoteProcessClient::write(const unordered_map<int, Action>& actions) {
+void RemoteProcessClient::write(const unordered_map<int, Action>& actions, const string& custom_rendering) {
     Document d;
     d.SetObject();
     Document::AllocatorType& allocator = d.GetAllocator();
@@ -86,7 +85,7 @@ void RemoteProcessClient::write(const unordered_map<int, Action>& actions) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     d.Accept(writer);
-    writeline(buffer.GetString());
+    writeline(string(buffer.GetString()) + "|" + custom_rendering + "\n<end>");
 }
 
 void RemoteProcessClient::write_token(const string& token) {

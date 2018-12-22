@@ -1,5 +1,5 @@
-use model::*;
-use strategy::Strategy;
+use crate::model::*;
+use crate::strategy::Strategy;
 
 pub struct MyStrategy;
 

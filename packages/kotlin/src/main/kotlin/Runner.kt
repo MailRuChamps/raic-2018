@@ -33,7 +33,7 @@ private constructor(args: Array<String>) {
                     actions[robot.id] = action
                 }
             }
-            remoteProcessClient.write(actions)
+            remoteProcessClient.write(actions, strategy.customRendering())
         }
     }
 

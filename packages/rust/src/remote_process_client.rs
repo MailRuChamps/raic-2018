@@ -34,9 +34,9 @@ impl RemoteProcessClient {
         }
         Ok(Some(::serde_json::from_str(&self.buffer)?))
     }
-    pub fn write<T: Serialize>(&mut self, value: &T) -> io::Result<()> {
+    pub fn write<T: Serialize>(&mut self, value: &T, custom_rendering: &str) -> io::Result<()> {
         use std::io::Write;
-        writeln!(self.writer, "{}", ::serde_json::to_string(value)?)?;
+        writeln!(self.writer, "{}|{}\n<end>", ::serde_json::to_string(value)?, custom_rendering)?;
         self.writer.flush()?;
         Ok(())
     }

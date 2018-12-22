@@ -1,3 +1,3 @@
-set -ex
+set -e
 
 cd /output && ./MyStrategy "$@"

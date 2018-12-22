@@ -11,9 +11,9 @@ mod my_strategy;
 mod remote_process_client;
 mod strategy;
 
-use remote_process_client::RemoteProcessClient;
+use crate::remote_process_client::RemoteProcessClient;
+use crate::strategy::Strategy;
 use std::io;
-use strategy::Strategy;
 
 struct Args {
     host: String,
@@ -24,7 +24,7 @@ struct Args {
 fn main() {
     env_logger::init();
 
-    use my_strategy::MyStrategy;
+    use crate::my_strategy::MyStrategy;
     use std::io::{stderr, Write};
     use std::process::exit;
 
@@ -92,7 +92,7 @@ impl Runner {
                 actions.insert(robot.id, action);
             }
             debug!("{:?}", actions);
-            self.client.write(&actions)?;
+            self.client.write(&actions, &strategy.custom_rendering())?;
             debug!("Written");
         }
 
