@@ -1,3 +1,3 @@
 set -e
 
-cd /output && java -jar ./java-cgdk-jar-with-dependencies.jar "$@"
+cd /output && java -Xmx256m -jar ./java-cgdk-jar-with-dependencies.jar "$@"
