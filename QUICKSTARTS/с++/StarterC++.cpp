@@ -50,8 +50,8 @@ void MyStrategy::act(const Robot& me, const Rules& rules, const Game& game, Acti
             // (произойдет столкновение со стеной, которое мы не рассматриваем),
             // и при этом мяч будет находится ближе к вражеским воротам, чем робот,
             if (   ball_pos.z > me.z
-                && abs(ball.x) < (rules.arena.width / 2.0)
-                && abs(ball.z) < (rules.arena.depth / 2.0) ) {
+                && abs(ball_pos.x) < (rules.arena.width / 2.0)
+                && abs(ball_pos.z) < (rules.arena.depth / 2.0) ) {
                 // Посчитаем, с какой скоростью робот должен бежать,
                 // Чтобы прийти туда же, где будет мяч, в то же самое время
                 Point2D delta_pos(ball_pos.x - me.x, ball_pos.z - me.z);
