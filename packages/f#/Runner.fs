@@ -27,7 +27,7 @@ module Runner =
                 let action = emptyAction()
                 MyStrategy.act(robot, rules, game, action)
                 actions <- Map.add (string robot.id) action actions
-            rpc.write actions
+            rpc.write (actions, MyStrategy.customRendering())
             gameOpt <- rpc.readGame()
 
     
