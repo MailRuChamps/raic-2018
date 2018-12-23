@@ -35,9 +35,10 @@ type RemoteProcessClient(host, port) =
             Some (Json.deserialize line)
 
 
-    member this.write (actions : Map<string, Action>) = 
+    member this.write (actions : Map<string, Action>, custom_rendering : string) = 
         let json = Json.serializeU actions
-        writer.WriteLine json
+        let msg = sprintf "%s|%s\n<end>" json custom_rendering
+        writer.WriteLine msg
         writer.Flush()
 
 

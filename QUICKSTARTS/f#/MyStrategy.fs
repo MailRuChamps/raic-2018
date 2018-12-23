@@ -61,7 +61,10 @@ module MyStrategy =
             if game.ball.velocity_z > -EPS then 
                 V3(0.0, 0.0, target_pos_z)
             else
-                V3(x, 0.0, target_pos_z)
+                if abs x < (rules.arena.goal_width / 2.0) then
+                    V3(x, 0.0, target_pos_z)
+                else
+                    V3(0.0, 0.0, target_pos_z)
 
                 
         let max_speed = rules.ROBOT_MAX_GROUND_SPEED
@@ -75,7 +78,8 @@ module MyStrategy =
             |> projectionXZ
 
         let target_delta = sub interception me_pos
-        let target_velocity = divScalar target_delta max_speed
+        let norm_delta = divScalar target_delta (length target_delta)
+        let target_velocity = mulScalar norm_delta max_speed
 
         let delta = sub ball_pos me_pos
 
@@ -147,7 +151,7 @@ module MyStrategy =
             let delta2 = sub ball_pos me_pos
             let need_speed = length delta2 / time
             let velocity = divScalar delta2 time
-            if isPossibleSpeed need_speed then
+            if isPossibleSpeed need_speed && vZ ball_pos > vZ me_pos then
                 Some {                
                     target_velocity_x = vX velocity
                     target_velocity_y = vY velocity
@@ -216,3 +220,8 @@ module MyStrategy =
             else
                 protectAct (me, rules, game, action)
         assignFieldsAction action newAction
+
+
+    let customRendering () : string =
+        ""
+ 
