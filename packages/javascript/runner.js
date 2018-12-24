@@ -59,7 +59,6 @@ var MyStrategy = require(__dirname + '/' + (process.argv[5] || './my-strategy.js
 var isCallbackedStrategy = false;
 var actions;
 var callBackCount;
-var _action;
 
 function run() {
     remoteProcessClient.writeTokenMessage(token, function() {
@@ -76,7 +75,7 @@ function run() {
 function handleGameFrame(v) {
     game = v;
     strategy = MyStrategy.getInstance();
-    isCallbackedStrategy = strategy.length === 5; //http proxy strategy with callback
+    isCallbackedStrategy = strategy.act.length === 5; //http proxy strategy with callback
 
     if (!game) {
         remoteProcessClient.close();
@@ -84,7 +83,7 @@ function handleGameFrame(v) {
     }
 
     callBackCount = 0;
-    actions = [];
+    actions = {};
 
     for (let robot of game.robots) {
         if (robot.is_teammate) {
@@ -100,19 +99,18 @@ function handleGameFrame(v) {
 function callStrategy(robot, rules, game, action) {
     if (isCallbackedStrategy) {
         callBackCount++;
-        strategy(robot, rules, game, action, function (returnedAction) {
-            _action = returnedAction;
+        strategy.act(robot, rules, game, action, function (returnedAction) {
             callBackCount--;
             if (callBackCount === 0) {
                 afterAllStrategyProcessed();
             }
         });
     } else {
-        strategy(robot, rules, game, action);
+        strategy.act(robot, rules, game, action);
     }
 }
 
 function afterAllStrategyProcessed() {
-    remoteProcessClient.write(actions);
+    remoteProcessClient.write(actions, strategy.customRendering());
     remoteProcessClient.readGame(handleGameFrame);
 }

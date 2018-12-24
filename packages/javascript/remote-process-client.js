@@ -39,10 +39,18 @@ module.exports.connect = function connect(host, port, onConnect) {
         process.exit();
     });
 
+    let tickData = '';
     function dataHandler(data) {
         busy = true;
         if (data) {
-            strBuffer = strBuffer.concat(data.toString().split("\n").filter((item) => { return item.length }));
+            //by Gondragos
+            // sometimes we get tick data by parts 
+            tickData = tickData + data.toString();
+            // tickData is complete when we get '\n'
+            if (tickData[tickData.length -1] === '\n') {
+                strBuffer.push(tickData);
+                tickData = '';
+            }
         }
         while (request.length && strBuffer.length) {
             let cb = request.shift();
@@ -89,13 +97,13 @@ module.exports.connect = function connect(host, port, onConnect) {
         });
     }
     
-    this.write = function(actions) {
+    this.write = function(actions, customRendering) {
         let map = {};
         for (let id in actions) {
             map[id] = actions[id].toObject();
         }
         let json = JSON.stringify(map);
-        writeline(json);
+        writeline(json + '|' + customRendering + '\n<end>');
     }
     
     this.writeTokenMessage = function(token, cb) {

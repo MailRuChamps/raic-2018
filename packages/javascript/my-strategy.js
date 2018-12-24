@@ -19,5 +19,12 @@ module.exports.getInstance = function () {
         
     };
 
-    return act; //возвращаем функцию act, чтобы runner мог ее вызывать
+    var customRendering = function () {
+        return "";
+    };
+
+    return {
+        act: act, //возвращаем функцию act, чтобы runner мог ее вызывать
+        customRendering: customRendering //фукнция customRendering для отрисовки отладочной информации
+    }
 };
