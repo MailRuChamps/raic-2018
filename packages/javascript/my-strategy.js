@@ -16,7 +16,7 @@ module.exports.getInstance = function () {
      */
 
     var act = function (me, rules, game, action) {
-        
+
     };
 
     var customRendering = function () {
@@ -25,6 +25,6 @@ module.exports.getInstance = function () {
 
     return {
         act: act, //возвращаем функцию act, чтобы runner мог ее вызывать
-        customRendering: customRendering //фукнция customRendering для отрисовки отладочной информации
+        customRendering: customRendering //функция customRendering для отрисовки отладочной информации
     }
 };
