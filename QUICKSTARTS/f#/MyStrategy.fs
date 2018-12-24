@@ -1,151 +1,197 @@
 namespace FSharpCgdk
 
 open FSharpCgdk.Model
-open System.Numerics
 open FSharp.Json
 
-
-type StrategyData = 
-    | EmptyData
-    | KnownAttackBot of forTick: int * botId : int 
-
-
-type ActData = Robot * Rules * Game * Action
+// Данные, в которых будем хранить атакующего бота, чтобы не пересчитывать дважды
+// forTick - для какого тика актуальна информация, botId - id атакующего бота
+type StrategyData = KnownAttackBot of forTick: int * botId : int 
 
 
 module MyStrategy = 
+    // Эпсилон! :D
     let private EPS = 0.1
 
-    let private vector2 x y = Vector2 (x, y) 
+    // Краткое описание собственной веткорной алгебры.
+    type Vector = V3 of X : float * Y : float * Z : float
 
-    let private posFromRobot (m : Robot) = Vector3 (float32 m.x, float32 m.y, float32 m.z) 
-    let private velFromRobot (m : Robot) = Vector3 (float32 m.velocity_x, float32 m.velocity_y, float32 m.velocity_z) 
-    
-    let private posFromBall (m : Ball) = Vector3 (float32 m.x, float32 m.y, float32 m.z) 
-    let private velFromBall (m : Ball) = Vector3 (float32 m.velocity_x, float32 m.velocity_y, float32 m.velocity_z) 
-    
-    let private pos2FromRobot (m : Robot) = Vector2 (float32 m.x, float32 m.z) 
-    let private vel2FromRobot (m : Robot) = Vector2 (float32 m.velocity_x, float32 m.velocity_z) 
+    let vX (V3(x, y, z)) = x
+    let vY (V3(x, y, z)) = y
+    let vZ (V3(x, y, z)) = z
 
-    let private pos2FromBall (m : Ball) = Vector2 (float32 m.x, float32 m.z) 
-    let private vel2FromBall (m : Ball) = Vector2 (float32 m.velocity_x, float32 m.velocity_z) 
+    let add (V3(x1, y1, z1)) (V3(x2, y2, z2)) = 
+        V3(x1 + x2, y1 + y2, z1 + z2)
+
+    let sub (V3(x1, y1, z1)) (V3(x2, y2, z2)) = 
+        V3(x1 - x2, y1 - y2, z1 - z2)
+
+    let mulScalar (V3(x, y, z)) mul = V3(x * mul, y * mul, z * mul)
+    let divScalar vector div = mulScalar vector (1.0/div)
+
+    let length (V3(x, y, z)) = sqrt (x * x + y * y + z * z)
+
+    let projectionXZ (V3(x, y, z)) = V3(x, 0.0, z)
+
+    let positionBall (ball : Ball) = V3(ball.x, ball.y, ball.z)    
+    let positionRobot (robot : Robot) = V3(robot.x, robot.y, robot.z)   
+
+    let velocityBall (ball : Ball) = V3(ball.velocity_x, ball.velocity_y, ball.velocity_z)    
+    let velocityRobot (robot : Robot) = V3(robot.velocity_x, robot.velocity_y, robot.velocity_z)   
 
 
-    let private getJumpSpeed (dist_for_jump : float) (jump_speed : float) (robot : Robot) (ball : Ball) (dist : float) : float = 
-        let need_jump = dist < dist_for_jump && robot.y < ball.y
-        if need_jump then jump_speed else 0.0
+    // Та самая хранимая информация.
+    // Инициализируем не существующим тиком.
+    let mutable data : StrategyData = KnownAttackBot(-1, -1)
 
-    let private isNormalSpeed max_speed speed = 
-        0.5 * max_speed < speed && speed < max_speed
-
-
-    let mutable data : StrategyData = EmptyData
+    // Дальше следует читать программу снизу вверх для лучшего понимания
+    // Последовательность чтения:
+    // act -> nextData ->  attackAct -> entryAttackPoint -> defeatAct
 
 
-    let protectAct (args : ActData) : Action =
-        let me, rules, game, _ = args
-        let ball, arena = game.ball, rules.arena
+    let protectAct (me, rules, game, _) : Action =
 
-        let target_pos_z = -(arena.depth / 2.) + arena.bottom_radius
-        let time = (target_pos_z - ball.z) / ball.velocity_z  
-        let x = ball.x + ball.velocity_x * time
+        // Вычисляем куда встать как вратари на проекции оси OZ
+        let target_pos_z = -(rules.arena.depth / 2.0) + rules.arena.bottom_radius
+        // Вычисляем куда встать на проекции OX
+        let time = (target_pos_z - game.ball.z) / game.ball.velocity_z  
+        let x = game.ball.x + game.ball.velocity_x * time
 
+        // Сама точка перехвата
         let interception = 
-            if ball.velocity_z > -EPS then 
-                vector2 0.f (float32 target_pos_z)
+            if game.ball.velocity_z > -EPS then 
+                V3(0.0, 0.0, target_pos_z)
             else
-                vector2 (float32 x) (float32 target_pos_z)
+                if abs x < (rules.arena.goal_width / 2.0) then
+                    V3(x, 0.0, target_pos_z)
+                else
+                    V3(0.0, 0.0, target_pos_z)
 
-        let me_pos2 = pos2FromRobot me
-        let max_speed32 = float32 rules.ROBOT_MAX_GROUND_SPEED
-        let target_velocity = (interception - me_pos2) * max_speed32
+                
+        let max_speed = rules.ROBOT_MAX_GROUND_SPEED
+        
+        // Узнаем положение робота и мяча без высоты 
+        let me_pos = 
+            positionRobot me
+            |> projectionXZ
+        let ball_pos = 
+            positionBall game.ball
+            |> projectionXZ
 
-        let delta = (pos2FromBall ball) - me_pos2
+        let target_delta = sub interception me_pos
+        let norm_delta = divScalar target_delta (length target_delta)
+        let target_velocity = mulScalar norm_delta max_speed
 
-        let dist_for_jump = rules.ROBOT_RADIUS + rules.BALL_RADIUS
+        let delta = sub ball_pos me_pos
+
+        let dist_for_touch = rules.ROBOT_RADIUS + rules.BALL_RADIUS
         let max_jump_speed = rules.ROBOT_MAX_JUMP_SPEED
+        // Если робот касается мяча и находится ниже его,
+        // то прыгаем как можно сильнее, чтобы пнуть его.
         let jump_speed = 
-            delta.Length() 
-            |> float 
-            |> getJumpSpeed dist_for_jump max_jump_speed me ball
+            if length delta <= dist_for_touch && me.y < game.ball.y then 
+                max_jump_speed
+            else
+                 0.0
 
         {
-            target_velocity_x = float target_velocity.X
+            target_velocity_x = vX target_velocity
             target_velocity_y = 0.0
-            target_velocity_z = float target_velocity.Y
+            target_velocity_z = vZ target_velocity
             jump_speed = jump_speed
             use_nitro = true
         }
 
 
-    let attackEntryPoint (me, rules, game, action) : Action option = 
-        let delta = (posFromBall game.ball) - (posFromRobot me)
+    let attackEntryPoint (me, rules, game, _) : Action option = 
+        // Расстояние между мячом и роботом.
+        let delta = sub (positionBall game.ball) (positionRobot me)
 
-        let dist_for_jump = rules.ROBOT_RADIUS + rules.BALL_RADIUS
+        let dist_for_touch = rules.ROBOT_RADIUS + rules.BALL_RADIUS
         let max_jump_speed = rules.ROBOT_MAX_JUMP_SPEED
+        // Если робот касается мяча и находится ниже его,
+        // то прыгаем как можно сильнее, чтобы пнуть его.
         let jump_speed = 
-            delta.Length() 
-            |> float 
-            |> getJumpSpeed dist_for_jump max_jump_speed me game.ball
+            if length delta <= dist_for_touch && me.y < game.ball.y then 
+                max_jump_speed
+            else
+                 0.0
         
-        let me_pos2 = pos2FromRobot me
+        // Узнаем положение робота и мяча и скорость мяча без высоты 
+        let me_pos = 
+            positionRobot me
+            |> projectionXZ
+        let ball_pos =
+            positionBall game.ball
+            |> projectionXZ
+        let ball_vel =
+            velocityBall game.ball
+            |> projectionXZ
 
+        // Провекрка возможности требуемой скорости
         let max_speed = rules.ROBOT_MAX_GROUND_SPEED
-        let isPossibleSpeed : float -> bool = isNormalSpeed max_speed
+        let isPossibleSpeed speed = 
+            0.5 * max_speed < speed && speed < max_speed
 
-        let tryAttack (pos2 : Vector2, time : float32) = 
-            let delta2 = pos2 - me_pos2
-            let need_speed = delta.Length() / time
-            let target_velocity = delta2 / time
-            match isPossibleSpeed (float need_speed) with
-            | true -> 
+        // Узнаем положение мяча через определенное время
+        let delta_ball_pos = mulScalar ball_vel 0.1
+        let ballPosWithTime t  = 
+            let time = float t * 0.1
+            let new_delta_ball_pos = mulScalar delta_ball_pos time
+            let new_pos = add ball_pos new_delta_ball_pos
+            (new_pos, time)
+
+        let ballInArena (ball_pos : Vector, _) = 
+            abs(vX ball_pos) < rules.arena.width / 2.0 
+            && abs(vZ ball_pos) < rules.arena.depth / 2.0
+
+        // Для текущего положение мяча без высоты и времени
+        // пытаемся узнать, сможем ли мы добежать до мяча чтобы пнуть его
+        let tryAttack (ball_pos : Vector, time : float) = 
+            // расстояние, требуемая скорость и вектор требуемой скорости
+            let delta2 = sub ball_pos me_pos
+            let need_speed = length delta2 / time
+            let velocity = divScalar delta2 time
+            if isPossibleSpeed need_speed && vZ ball_pos > vZ me_pos then
                 Some {                
-                    target_velocity_x = float target_velocity.X
-                    target_velocity_y = 0.0
-                    target_velocity_z = float target_velocity.Y
+                    target_velocity_x = vX velocity
+                    target_velocity_y = vY velocity
+                    target_velocity_z = vZ velocity
                     jump_speed = jump_speed
                     use_nitro = true
                 }
-            | false -> None      
+            else
+                None  
 
-        let ball_pos2 = pos2FromBall game.ball
-        let ball_pos2_delta = vel2FromBall game.ball * 0.1f
-        let ballPosAfterTicksWithTime ticks  = 
-            let new_pos2 = ball_pos2 + ball_pos2_delta * float32 ticks
-            let new_time = 0.1f * float32 ticks
-            (new_pos2, new_time)
-
-        let ballInArena (pos2 : Vector2, _) = 
-            abs(float pos2.X) < rules.arena.width / 2. 
-            && abs(float pos2.Y) < rules.arena.depth / 2.
-
-        Array.init 100 ballPosAfterTicksWithTime
+        // Перебираем положение мяча в будущем, 
+        // до тех пор пока не выйдет за границы арены,
+        // беря первый попавшийся вариант, в котором можем сможем добежать до мяча.
+        Array.init 100 ballPosWithTime
         |> Array.takeWhile ballInArena
         |> Array.tryPick tryAttack
 
 
-    let attackAct (args : ActData) : Action =
+    let attackAct args : Action =
+        // Если нашли коим образом можно атаковать,
+        // то возвращаем это действие,
+        // иначе переходим в режим защиты
         match attackEntryPoint args with
         | Some x -> x
         | None -> protectAct args
-    
-
-    let (|AttackBot|ProtectBot|) (robot : Robot) =
-        match data with
-        | EmptyData -> failwith "EmptyData at (|AttackBot|ProtectBot|). Error!!!"
-        | KnownAttackBot (tick, id) when id = robot.id -> AttackBot
-        | otherwise -> ProtectBot
 
 
     let private tuple2 x y = (x, y)
 
 
-    let nextData (args : ActData) : StrategyData = 
-        let _, _, game, _ = args
+    let nextData game : StrategyData = 
         let cur_tick = game.current_tick
-        match data with
-        | KnownAttackBot(tick, _) when tick = cur_tick -> data
-        | otherwise ->
+        let tick = 
+            match data with
+            | KnownAttackBot(x, _) -> x 
+        // Если информация актуальна то ничего не делаем,
+        // иначе атакующим будет ближайший к воротам
+        if cur_tick = tick then
+            data
+        else
             game.robots
             |> Array.filter (fun x -> x.is_teammate)
             |> Array.maxBy (fun x -> x.z)
@@ -162,9 +208,20 @@ module MyStrategy =
         toActoin.use_nitro <- fromAction.use_nitro
 
     let act (me : Robot, rules : Rules, game : Game, action : Action) =
-        data <- nextData (me, rules, game, action)
-        let args = me, rules, game, action
-        match me with
-        | AttackBot  -> attackAct args
-        | ProtectBot -> protectAct args
-        |> assignFieldsAction action
+        // Обновляем в случае необходимости id атакующего робота.
+        data <- nextData game
+        // Проверяем атакующий ли сейчас робот 
+        let idAttackBot =
+            match data with
+            | KnownAttackBot(_, x) -> x 
+        let newAction =         
+            if me.id = idAttackBot then
+                attackAct (me, rules, game, action)
+            else
+                protectAct (me, rules, game, action)
+        assignFieldsAction action newAction
+
+
+    let customRendering () : string =
+        ""
+ 

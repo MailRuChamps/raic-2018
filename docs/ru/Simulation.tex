@@ -34,7 +34,7 @@ function collide_with_arena(e: Entity):
             return normal
     return None
 
-function move(e: Entity):
+function move(e: Entity, delta_time: float):
     e.velocity = clamp(e.velocity, MAX_ENTITY_SPEED)
     e.position += e.velocity * delta_time
     e.position.y -= GRAVITY * delta_time * delta_time / 2
@@ -71,12 +71,12 @@ function update(delta_time: float):
                 robot.nitro -= length(velocity_change)
                     / NITRO_POINT_VELOCITY_CHANGE
 
-        move(robot)
+        move(robot, delta_time)
         robot.radius = ROBOT_MIN_RADIUS + (ROBOT_MAX_RADIUS - ROBOT_MIN_RADIUS)
                     * robot.action.jump_speed / ROBOT_MAX_JUMP_SPEED
         robot.radius_change_speed = robot.action.jump_speed
 
-    move(ball)
+    move(ball, delta_time)
 
     for i in 0 .. length(robots) - 1:
         for j in 0 .. i - 1:

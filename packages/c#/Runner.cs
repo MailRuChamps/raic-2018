@@ -37,7 +37,7 @@ namespace Com.CodeGame.CodeBall2018.DevKit.CSharpCgdk
                         actions.Add(robot.id, action);
                     }
                 }
-                remoteProcessClient.Write(actions);
+                remoteProcessClient.Write(actions, strategy.CustomRendering());
             }
         }
     }

@@ -35,7 +35,7 @@ class Runner:
                     strategy.act(robot, rules, game, action)
                     actions[robot.id] = action
 
-            self.remote_process_client.write(actions)
+            self.remote_process_client.write(actions, strategy.custom_rendering())
 
 
 Runner().run()

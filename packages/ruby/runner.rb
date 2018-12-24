@@ -29,7 +29,7 @@ class Runner
           end
         end
 
-        @remote_process_client.write(actions)
+        @remote_process_client.write(actions, strategy.custom_rendering)
       end
     end
   end

@@ -12,8 +12,8 @@ mod remote_process_client;
 mod strategy;
 
 use crate::remote_process_client::RemoteProcessClient;
-use std::io;
 use crate::strategy::Strategy;
+use std::io;
 
 struct Args {
     host: String,
@@ -92,7 +92,7 @@ impl Runner {
                 actions.insert(robot.id, action);
             }
             debug!("{:?}", actions);
-            self.client.write(&actions)?;
+            self.client.write(&actions, &strategy.custom_rendering())?;
             debug!("Written");
         }
 
