@@ -1,12 +1,12 @@
 class Ball {
-  constructor() {
-    this.x = 0;
-    this.y = 0;
-    this.z = 0;
-    this.velocity_x = 0;
-    this.velocity_y = 0;
-    this.velocity_z = 0;
-    this.radius = 0;
+  constructor({ x, y, z, velocity_x, velocity_y, velocity_z, radius }) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.velocity_x = velocity_x;
+    this.velocity_y = velocity_y;
+    this.velocity_z = velocity_z;
+    this.radius = radius;
   }
 }
 module.exports = Ball;

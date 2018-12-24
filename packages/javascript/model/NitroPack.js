@@ -1,12 +1,12 @@
 class NitroPack {
-  constructor() {
-    this.id = 0;
-    this.x = 0;
-    this.y = 0;
-    this.z = 0;
-    this.radius = 0;
-    this.nitro_amount = 0;
-    this.respawn_ticks = null;
+  constructor({ id, x, y, z, radius, nitro_amount, respawn_ticks }) {
+    this.id = id;
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.radius = radius;
+    this.nitro_amount = nitro_amount;
+    this.respawn_ticks = respawn_ticks;
   }
 }
 module.exports = NitroPack;
