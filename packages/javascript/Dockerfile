@@ -1,3 +1,4 @@
 FROM node:10.14.2-alpine
-WORKDIR /output
+RUN apk add --no-cache bash
+WORKDIR /project
 COPY . .

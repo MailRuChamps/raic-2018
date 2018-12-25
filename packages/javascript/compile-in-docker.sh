@@ -9,3 +9,5 @@ if [ "$1" != "base" ]; then
     rm MyStrategy.js
     cp -rn /src/* ./
 fi
+
+cp -r * /output/
