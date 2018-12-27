@@ -1,4 +1,4 @@
-FROM node:9.5.0-slim
+FROM node:11.5.0
 
 COPY . /project
 WORKDIR /project

@@ -46,10 +46,11 @@ module.exports.connect = function connect(host, port, onConnect) {
             //by Gondragos
             // sometimes we get tick data by parts 
             tickData = tickData + data.toString();
-            // tickData is complete when we get '\n'
-            if (tickData[tickData.length -1] === '\n') {
-                strBuffer.push(tickData);
-                tickData = '';
+            var eol = tickData.indexOf('\n');
+            while (eol !== -1) {
+                strBuffer.push(tickData.substr(0, eol));
+                tickData = tickData.substr(eol + 1);
+                eol = tickData.indexOf('\n');
             }
         }
         while (request.length && strBuffer.length) {
