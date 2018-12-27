@@ -17,7 +17,7 @@ function collide_entities(a: Entity, b: Entity):
         a.position -= normal * penetration * k_a
         b.position += normal * penetration * k_b
         let delta_velocity = dot(b.velocity - a.velocity, normal)
-            + b.radius_change_speed - a.radius_change_speed
+            - b.radius_change_speed - a.radius_change_speed
         if delta_velocity < 0:
             let impulse = (1 + random(MIN_HIT_E, MAX_HIT_E)) * delta_velocity * normal
             a.velocity += impulse * k_a
