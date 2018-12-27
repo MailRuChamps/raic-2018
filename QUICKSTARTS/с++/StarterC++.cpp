@@ -25,7 +25,7 @@ void MyStrategy::act(const Robot& me, const Rules& rules, const Game& game, Acti
     // с той же стороны от мяча, что и наши ворота, прыгнем, тем самым
     // ударив по мячу сильнее в сторону противника
     bool jump = (   ball.distTo(me.x, me.z, me.y) < (BALL_RADIUS + ROBOT_MAX_RADIUS)
-                 && me.y < ball.y );
+                 && me.z < ball.z );
 
     // Так как роботов несколько, определим нашу роль - защитник, или нападающий
     // Нападающим будем в том случае, если есть дружественный робот,
@@ -43,7 +43,7 @@ void MyStrategy::act(const Robot& me, const Rules& rules, const Game& game, Acti
     if (is_attacker) {
         // Стратегия нападающего:
         // Просимулирем примерное положение мяча в следующие 10 секунд, с точностью 0.1 секунда
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 1; i <= 100; ++i) {
             double t = i * 0.1;
             Point3D ball_pos = ball + ball_v*t;
             // Если мяч не вылетит за пределы арены
