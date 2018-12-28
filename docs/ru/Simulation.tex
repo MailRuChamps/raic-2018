@@ -397,6 +397,10 @@ function dan_to_arena(point: Vec3D):
         result.normal.x = -result.normal.x
     if negate_z:
         result.normal.z = -result.normal.z
+    if negate_x:
+        point.x = -point.x
+    if negate_z:
+        point.z = -point.z
     return result
 \end{verbatim}
 
