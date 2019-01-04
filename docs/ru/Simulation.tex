@@ -44,6 +44,9 @@ function update(delta_time: float):
     shuffle(robots)
 
     for robot in robots:
+        robot.radius_change_speed = robot.action.jump_speed
+        robot.radius = ROBOT_MIN_RADIUS + (ROBOT_MAX_RADIUS - ROBOT_MIN_RADIUS)
+                    * robot.action.jump_speed / ROBOT_MAX_JUMP_SPEED
         if robot.touch:
             let target_velocity = clamp(
                 robot.action.target_velocity,
@@ -72,9 +75,6 @@ function update(delta_time: float):
                     / NITRO_POINT_VELOCITY_CHANGE
 
         move(robot, delta_time)
-        robot.radius = ROBOT_MIN_RADIUS + (ROBOT_MAX_RADIUS - ROBOT_MIN_RADIUS)
-                    * robot.action.jump_speed / ROBOT_MAX_JUMP_SPEED
-        robot.radius_change_speed = robot.action.jump_speed
 
     move(ball, delta_time)
 
