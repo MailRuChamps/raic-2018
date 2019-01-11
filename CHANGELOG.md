@@ -2,6 +2,7 @@
 
 - Added `outside opacity` setting
 - Camera & rendering mode is now saved
+- Fixed custom rendered sphere sizes
 
 # 1.0.1
 
