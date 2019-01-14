@@ -30,6 +30,6 @@ class RemoteProcessClient
     return Rules.new(json)
   end
   def write(actions, custom_rendering)
-    write_line(actions.to_json + '|' + custom_rendering + '\n<end>')
+    write_line(actions.to_json + '|' + custom_rendering + "\n<end>")
   end
 end
