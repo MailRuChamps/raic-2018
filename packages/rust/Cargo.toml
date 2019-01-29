@@ -9,3 +9,8 @@ env_logger = "0.6.0"
 serde = "1"
 serde_json = "1"
 serde_derive = "1"
+
+[[bin]]
+name = "repeater"
+edition = "2018"
+path = "src/repeater.rs"
