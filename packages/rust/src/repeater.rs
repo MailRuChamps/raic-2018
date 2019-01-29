@@ -311,7 +311,7 @@ struct Vec3 {
 impl Vec3 {
     pub fn opposite(&self) -> Vec3 {
         Vec3 {
-            x: -self.x,
+            x: self.x,
             y: self.y,
             z: -self.z,
         }
